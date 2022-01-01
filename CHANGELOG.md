@@ -286,6 +286,64 @@ Non-backwards compatible changes
   1/pos⇒pos : ∀ p .{{_ : NonZero p}} .{{Positive (1/ p)}} → Positive p
   ```
 
+* Various modules have changed the types of some definitions to use the new
+  function hierachy:
+  * `Data.Fin.Properties`
+    * `∀-cons-⇔`
+    * `⊎⇔∃`
+  * `Data.Fin.Subset.Properties`
+    * `out⊆-⇔`
+    * `in⊆in-⇔`
+    * `out⊂in-⇔`
+    * `out⊂out-⇔`
+    * `in⊂in-⇔`
+    * `x∈⁅y⁆⇔x≡y`
+    * `∩⇔×`
+    * `∪⇔⊎`
+    * `∃-Subset-[]-⇔`
+    * `∃-Subset-∷-⇔`
+  * `Data.List.Countdown`
+    * `empty`
+  * `Data.List.Fresh.Relation.Unary.Any`
+    * `⊎⇔Any`
+  * `Data.List.Relation.Binary.Lex`
+    * `[]<[]-⇔`
+    * `∷<∷-⇔`
+  * `Data.List.Relation.Binary.Sublist.Heterogeneous.Properties`
+    * `∷⁻¹`
+    * `∷ʳ⁻¹`
+    * `Sublist-[x]-bijection`
+  * `Data.List.Relation.Binary.Sublist.Setoid.Properties`
+    * `∷⁻¹`
+    * `∷ʳ⁻¹`
+    * `[x]⊆xs⤖x∈xs`
+  * `Data.Maybe.Relation.Binary.Connected`
+    * `just-equivalence`
+  * `Data.Maybe.Relation.Binary.Pointwise`
+    * `just-equivalence`
+  * `Data.Maybe.Relation.Unary.All`
+    * `just-equivalence`
+  * `Data.Maybe.Relation.Unary.Any`
+    * `just-equivalence`
+  * `Data.Nat.Divisibility`
+    * `m%n≡0⇔n∣m`
+  * `Data.Nat.Properties`
+    * `eq?`
+  * `Data.Vec.Relation.Binary.Lex.Core`
+    * `P⇔[]<[]`
+    * `∷<∷-⇔`
+  * `Data.Vec.Relation.Binary.Pointwise.Extensional`
+    * `equivalent`
+    * `Pointwise-≡↔≡`
+  * `Data.Vec.Relation.Binary.Pointwise.Inductive`
+    * `Pointwise-≡↔≡`
+  * `Relation.Binary.Construct.Closure.Reflexive.Properties`
+    * `⊎⇔Refl`
+  * `Relation.Binary.Construct.Closure.Transitive`
+    * `equivalent`
+  * `Relation.Nullary.Decidable`
+    * `map`
+
 Major improvements
 ------------------
 
@@ -514,6 +572,11 @@ New modules
   Algebra.Morphism.Construct.Identity
   ```
 
+* 'Optimised' tail-recursive exponentiation properties:
+  ```
+  Algebra.Properties.Semiring.Exp.TailRecursiveOptimised
+  ```
+
 * A small library for function arguments with default values:
   ```
   Data.Default
@@ -661,6 +724,12 @@ Other minor changes
                     CommutativeRing (a ⊔ b) (ℓ₁ ⊔ ℓ₂)
  ```
 
+* Added new functions to `Algebra.Definitions.RawSemiring`:
+  ```agda
+  _^[_]*_ : A → ℕ → A → A
+  _^ᵗ_     : A → ℕ → A
+  ```
+
 * Added new proofs to `Algebra.Properties.CommutativeSemigroup`:
   ```
   interchange : Interchangable _∙_ _∙_
@@ -706,6 +775,14 @@ Other minor changes
   remainder : Fin (n * k) → Fin k
   ```
 
+* Added new definitions and proofs in `Data.Fin.Permutation`:
+  ```agda
+  insert : Fin (suc m) → Fin (suc n) → Permutation m n → Permutation (suc m) (suc n)
+  insert-punchIn : insert i j π ⟨$⟩ʳ punchIn i k ≡ punchIn j (π ⟨$⟩ʳ k)
+  insert-remove : insert i (π ⟨$⟩ʳ i) (remove i π) ≈ π
+  remove-insert : remove i (insert i j π) ≈ π
+  ```
+
 * Added new proofs and `Inverse` bundles in `Data.Fin.Properties`:
   ```
   1↔⊤                : Fin 1 ↔ ⊤
@@ -716,9 +793,24 @@ Other minor changes
   ^↔→                : Extensionality _ _ → Fin (n ^ m) ↔ (Fin m → Fin n)
   ```
 
+* Added new functions in `Data.Integer.Base`:
+  ```
+  _^_ : ℤ → ℕ → ℤ
+  ```
+
 * Added new proofs in `Data.Integer.Properties`:
   ```agda
   sign-cong′ : s₁ ◃ n₁ ≡ s₂ ◃ n₂ → s₁ ≡ s₂ ⊎ (n₁ ≡ 0 × n₂ ≡ 0)
+  ≤-⊖ : m ℕ.≤ n → n ⊖ m ≡ + (n ∸ m)
+  ∣⊖∣-≤ : m ℕ.≤ n → ∣ m ⊖ n ∣ ≡ n ∸ m
+  ∣-∣-≤ : i ≤ j → + ∣ i - j ∣ ≡ j - i
+  ^-identityʳ : ∀ i → i ^ 1 ≡ i
+  ^-zeroˡ : ∀ n → 1ℤ ^ n ≡ 1ℤ
+  ^-distribˡ-+-* : ∀ i m n → i ^ (m ℕ.+ n) ≡ i ^ m * i ^ n
+  ^-semigroup-morphism : ∀ {i} → IsSemigroupMorphism ℕ.+-semigroup *-semigroup (i ^_)
+  ^-monoid-morphism : ∀ {i} → IsMonoidMorphism  ℕ.+-0-monoid *-1-monoid (i ^_)
+  ^-*-assoc : ∀ i m n → (i ^ m) ^ n ≡ i ^ (m ℕ.* n)
+  i^n≡0⇒i≡0 : ∀ i n → i ^ n ≡ 0ℤ → i ≡ 0ℤ
   ```
 
 * Added new proofs in `Data.List.Relation.Binary.Lex.Strict`:
