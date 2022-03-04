@@ -33,6 +33,19 @@ private
     B″ : Set b″
 
 ------------------------------------------------------------------------
+-- constructors
+
+module Constructors (R : REL A B ℓ) where
+
+  []⁺ : Pointwise R [] []
+  []⁺ ()
+
+  _∷⁺_ : ∀ {n} {x} {xs} {y} {ys} →
+         R x y → Pointwise R {n} xs ys → Pointwise R (x ∷ xs) (y ∷ ys)
+  (r ∷⁺ rs) zero    = r
+  (r ∷⁺ rs) (suc i) = rs i
+
+------------------------------------------------------------------------
 -- Relational properties
 
 module _ {R : Rel A ℓ} where
