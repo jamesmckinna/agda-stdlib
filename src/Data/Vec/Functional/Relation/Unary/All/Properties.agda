@@ -27,6 +27,19 @@ private
     C : Set c
 
 ------------------------------------------------------------------------
+-- constructors
+
+module Constructors (P : Pred A p) where
+
+  []⁺ : All P []
+  []⁺ ()
+
+  _∷⁺_ : ∀ {n} {x} {xs} →
+         P x → All P {n} xs → All P (x ∷ xs)
+  (p ∷⁺ ps) zero    = p
+  (p ∷⁺ ps) (suc i) = ps i
+
+------------------------------------------------------------------------
 -- map
 
 module _ {P : Pred A p} {Q : Pred B q} {f : A → B} where
