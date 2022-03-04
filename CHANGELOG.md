@@ -1290,6 +1290,18 @@ Other minor changes
   monad : RawMonad (λ (A : Set a) → Vec A n)
   ```
 
+* Added new proofs in `Data.Vec.Functional.Relation.Binary.Pointwise.Properties`:
+  ```agda
+  []⁺ : Pointwise R [] []
+  _∷⁺_ : R x y → Pointwise R {n} xs ys → Pointwise R (x ∷ xs) (y ∷ ys)
+  ```
+
+* Added new proofs in `Data.Vec.Functional.Relation.Unary.All.Properties`:
+  ```agda
+  []⁺ : All P []
+  _∷⁺_ : P x → All P {n} xs → All P (x ∷ xs)
+  ```
+
 * Added new proofs in `Data.Vec.Properties`:
   ```agda
   padRight-refl      : padRight ≤-refl a xs ≡ xs
