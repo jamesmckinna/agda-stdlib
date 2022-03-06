@@ -45,6 +45,9 @@ module Constructors (R : REL A B ℓ) where
   (r ∷⁺ rs) zero    = r
   (r ∷⁺ rs) (suc i) = rs i
 
+  [_]⁺ : ∀ {x} {y} → R x y → Pointwise R (x ∷ []) (y ∷ [])
+  [ r ]⁺ = r ∷⁺ []⁺
+
 ------------------------------------------------------------------------
 -- Relational properties
 
