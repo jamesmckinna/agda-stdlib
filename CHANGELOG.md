@@ -58,6 +58,17 @@ Non-backwards compatible changes
   `Codata` which used sized types have been moved inside a new folder named
   `Sized`, e.g. `Codata.Stream` has become `Codata.Sized.Stream`.
 
+#### Moved `Category` modules to `Effect`
+
+* As observed by Wen Kokke in Issue #1636, it no longer really makes sense
+  to group the modules which correspond to the variety of concepts of 
+  (effectful) type constructor arising in functional programming (esp. in haskell) 
+  such as `Monad`, `Applicative`, `Functor`, etc, under `Category.*`, as this
+  obstructs the importing of the `agda-categories` development into the Standard Library,
+  and moreover needlessly restricts the applicability of categorical concepts to this
+  (highly specific) mode of use. Correspondingly, modules grouped under `*.Categorical.*`
+  which exploited these structures for effectful programming have been renamed `*.Effectful`.  
+
 ### Improvements to pretty printing and regexes
 
 * In `Text.Pretty`, `Doc` is now a record rather than a type alias. This
@@ -925,6 +936,9 @@ Other minor changes
   record Loop  c ℓ : Set (suc (c ⊔ ℓ))
   record RingWithoutOne c ℓ : Set (suc (c ⊔ ℓ))
   record KleeneAlgebra c ℓ : Set (suc (c ⊔ ℓ)) 
+  record RawRingWithoutOne c ℓ : Set (suc (c ⊔ ℓ))
+  record Quasiring c ℓ : Set (suc (c ⊔ ℓ)) where
+  record Nearring c ℓ : Set (suc (c ⊔ ℓ)) where
   ```
   and the existing record `Lattice` now provides
   ```agda
@@ -1008,6 +1022,8 @@ Other minor changes
   record IsLoop (∙ \\ // : Op₂ A) (ε : A) : Set (a ⊔ ℓ)
   record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ)
   record IsKleeneAlgebra (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ)
+  record IsQuasiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+  record IsNearring (+ * : Op₂ A) (0# 1# : A) (_⁻¹ : Op₁ A) : Set (a ⊔ ℓ) where
   ```
   and the existing record `IsLattice` now provides
   ```
@@ -1024,6 +1040,9 @@ Other minor changes
   record IsLoopHomomorphism       (⟦_⟧ : A → B) : Set (a ⊔ ℓ₁ ⊔ ℓ₂)
   record IsLoopMonomorphism       (⟦_⟧ : A → B) : Set (a ⊔ ℓ₁ ⊔ ℓ₂)
   record IsLoopIsomorphism        (⟦_⟧ : A → B) : Set (a ⊔ b ⊔ ℓ₁ ⊔ ℓ₂)
+  record IsRingWithoutOneHomomorphism (⟦_⟧ : A → B) : Set (a ⊔ ℓ₁ ⊔ ℓ₂)
+  record IsRingWithoutOneMonomorphism (⟦_⟧ : A → B) : Set (a ⊔ ℓ₁ ⊔ ℓ₂)
+  record IsRingWithoutOneIsoMorphism (⟦_⟧ : A → B) : Set (a ⊔ b ⊔ ℓ₁ ⊔ ℓ₂)
   ```
 
 * Added new functions in `Category.Monad.State`:
@@ -1049,9 +1068,12 @@ Other minor changes
   remove-insert  : remove i (insert i j π) ≈ π
   ```
 
-* Added new proofs and `Inverse` bundles in `Data.Fin.Properties`:
+* Added new proofs in `Data.Fin.Properties`:
   ```
   1↔⊤                : Fin 1 ↔ ⊤
+  
+  0≢1+n              : zero ≢ suc i
+  
   ↑ˡ-injective       : i ↑ˡ n ≡ j ↑ˡ n → i ≡ j
   ↑ʳ-injective       : n ↑ʳ i ≡ n ↑ʳ j → i ≡ j
   finTofun-funToFin  : funToFin ∘ finToFun ≗ id
@@ -1071,8 +1093,14 @@ Other minor changes
   combine-monoˡ-<    :  i < j → combine i k < combine j l
 
   lower₁-injective   : lower₁ i n≢i ≡ lower₁ j n≢j → i ≡ j
-
+  pinch-injective    : suc i ≢ j → suc i ≢ k → pinch i j ≡ pinch i k → j ≡ k
+				  
   i<1+i              : i < suc i
+  
+  injective⇒≤               : ∀ {f : Fin m → Fin n} → Injective f → m ℕ.≤ n
+  <⇒notInjective            : ∀ {f : Fin m → Fin n} → n ℕ.< m → ¬ (Injective f)
+  ℕ→Fin-notInjective        : ∀ (f : ℕ → Fin n) → ¬ (Injective f)
+  cantor-schröder-bernstein : ∀ {f : Fin m → Fin n} {g : Fin n → Fin m} → Injective f → Injective g → m ≡ n
   ```
 
 * Added new functions in `Data.Integer.Base`:
@@ -1546,6 +1574,15 @@ Other minor changes
   ⊆-trans : Trans _⊆_ _⊆_ _⊆_
   ```
 
+* Added new proofs in `Relation.Binary.Properties.Setoid`:
+  ```
+  ≈-isPreorder     : IsPreorder _≈_ _≈_
+  ≈-isPartialOrder : IsPartialOrder _≈_ _≈_
+  
+  ≈-preorder : Preorder a ℓ ℓ
+  ≈-poset    : Poset a ℓ ℓ
+  ```
+
 * Added new definitions in `Relation.Binary.Definitions`:
   ```
   Cotransitive _#_ = ∀ {x y} → x # y → ∀ z → (x # z) ⊎ (z # y)
@@ -1576,6 +1613,9 @@ Other minor changes
   dcong₂  : (p : x₁ ≡ x₂) → subst B p y₁ ≡ y₂ → f x₁ y₁ ≡ f x₂ y₂
   dsubst₂ : (p : x₁ ≡ x₂) → subst B p y₁ ≡ y₂ → C x₁ y₁ → C x₂ y₂
   ddcong₂ : (p : x₁ ≡ x₂) (q : subst B p y₁ ≡ y₂) → dsubst₂ C p q (f x₁ y₁) ≡ f x₂ y₂
+  
+  isPartialOrder : IsPartialOrder _≡_ _≡_
+  poset          : Set a → Poset _ _ _
   ```
 
 * Added new operations in `System.Exit`:
@@ -1822,4 +1862,10 @@ This is a full list of proofs that have changed form to use irrelevant instance 
   ```agda
   iterate : (A → A) → A → ℕ → A
   iterate-is-fold : ∀ (z : A) s m → fold z s m ≡ iterate s z m
+  ```
+
+* Added new proofs to `Function.Properties.Inverse`:
+  ```agda
+  Inverse⇒Injection : Inverse S T → Injection S T
+  ↔⇒↣ : A ↔ B → A ↣ B
   ```
