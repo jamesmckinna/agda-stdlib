@@ -76,7 +76,7 @@ updateAt : Fin n → (A → A) → Vec A n → Vec A n
 updateAt zero    f (x ∷ xs) = f x ∷ xs
 updateAt (suc i) f (x ∷ xs) = x   ∷ updateAt i f xs
 
--- [ i ]%= f  modifiesxs looks up the i-th element of xs
+-- [ i ]%= xs looks up the i-th element of xs
 
 [_]%_ : Fin n → Vec A n → A
 [ i ]% xs = lookup xs i
