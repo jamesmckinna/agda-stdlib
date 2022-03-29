@@ -609,3 +609,4 @@ record TermLemmas (T : ℕ → Set) : Set₁ where
     t T./ map T.var ρ T.↑ T./ T.sub (t′ T./ map T.var ρ)           ≡⟨ sym $ cong (λ ρ′ → t T./ ρ′ T./ T.sub (t′ T./ map T.var ρ)) ↑≡↑ ⟩
     t T./ map T.var (ρ VarSubst.↑) T./ T.sub (t′ T./ map T.var ρ)  ≡⟨ sym $ cong₂ (λ t ρ → t T./ T.sub ρ) /Var≡/ /Var≡/ ⟩
     (t /Var ρ VarSubst.↑) T./ T.sub (t′ /Var ρ)                    ∎
+
