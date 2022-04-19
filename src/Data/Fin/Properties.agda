@@ -26,7 +26,7 @@ open import Data.Product.Properties using (,-injective)
 open import Data.Sum.Base as Sum using (_⊎_; inj₁; inj₂; [_,_]; [_,_]′)
 open import Data.Sum.Properties using ([,]-map-commute; [,]-∘-distr)
 open import Function.Base using (_∘_; id; _$_; flip)
-open import Function.Bundles using (_↣_; _⇔_; _↔_; mk⇔; mk↔′)
+open import Function.Bundles using (Injection; _↣_; _⇔_; _↔_; mk⇔; mk↔′)
 open import Function.Definitions using (Injective)
 open import Function.Definitions.Core2 using (Surjective)
 open import Function.Consequences using (contraInjective)
@@ -951,13 +951,13 @@ private
 
 -- The pigeonhole principle.
 
-pigeonhole : m ℕ.< n → (f : Fin n → Fin m) → ∃₂ λ i j → i ≢ j × f i ≡ f j
+pigeonhole : m ℕ.< n → (f : Fin n → Fin m) → ∃₂ λ i j → i < j × f i ≡ f j
 pigeonhole z<s               f = contradiction (f zero) λ()
 pigeonhole (s<s m<n@(s≤s _)) f with any? (λ k → f zero ≟ f (suc k))
-... | yes (j , f₀≡fⱼ) = zero , suc j , (λ()) , f₀≡fⱼ
+... | yes (j , f₀≡fⱼ) = zero , suc j , z<s , f₀≡fⱼ
 ... | no  f₀≢fₖ with pigeonhole m<n (λ j → punchOut (f₀≢fₖ ∘ (j ,_ )))
-...   | (i , j , i≢j , fᵢ≡fⱼ) =
-  suc i , suc j , i≢j ∘ suc-injective ,
+...   | (i , j , i<j , fᵢ≡fⱼ) =
+  suc i , suc j , s<s i<j ,
   punchOut-injective (f₀≢fₖ ∘ (i ,_)) _ fᵢ≡fⱼ
 
 injective⇒≤ : ∀ {f : Fin m → Fin n} → Injective _≡_ _≡_ f → m ℕ.≤ n
@@ -1008,8 +1008,19 @@ module _ {f} {F : Set f → Set f} (RF : RawFunctor F) where
 -- If there is an injection from a type A to a finite set, then the type
 -- has decidable equality.
 
-eq? : A ↣ Fin n → DecidableEquality A
-eq? inj = Dec.via-injection inj _≟_
+module _ {ℓ} {S : Setoid a ℓ} (inj : Injection S (≡-setoid n)) where
+  open Setoid S
+
+  inj⇒≟ : B.Decidable _≈_
+  inj⇒≟ = Dec.via-injection inj _≟_
+
+  inj⇒decSetoid : DecSetoid a ℓ
+  inj⇒decSetoid = record
+    { isDecEquivalence = record
+      { isEquivalence = isEquivalence
+      ; _≟_           = inj⇒≟
+      }
+    }
 
 ------------------------------------------------------------------------
 -- Opposite
@@ -1090,4 +1101,9 @@ Fin0↔⊥ = 0↔⊥
 "Warning: Fin0↔⊥ was deprecated in v2.0.
 Please use 0↔⊥ instead."
 #-}
-
+eq? : A ↣ Fin n → DecidableEquality A
+eq? = inj⇒≟
+{-# WARNING_ON_USAGE eq?
+"Warning: eq? was deprecated in v2.0.
+Please use inj⇒≟ instead."
+#-}
