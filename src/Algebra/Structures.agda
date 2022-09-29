@@ -53,6 +53,52 @@ record IsCommutativeMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
 
   open IsMagma isMagma public
 
+record IsIdempotentMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
+  field
+    isMagma : IsMagma ∙
+    idem    : Idempotent ∙
+
+  open IsMagma isMagma public
+
+record IsAlternativeMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
+  field
+    isMagma  : IsMagma ∙
+    alter    : Alternative ∙
+
+  open IsMagma isMagma public
+
+  alternativeˡ : LeftAlternative ∙
+  alternativeˡ = proj₁ alter
+
+  alternativeʳ : RightAlternative ∙
+  alternativeʳ = proj₂ alter
+
+record IsFlexibleMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
+  field
+    isMagma  : IsMagma ∙
+    flex     : Flexible ∙
+
+  open IsMagma isMagma public
+
+record IsMedialMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
+  field
+    isMagma : IsMagma ∙
+    medial  : Medial ∙
+
+  open IsMagma isMagma public
+
+record IsSemimedialMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
+  field
+    isMagma    : IsMagma ∙
+    semiMedial : Semimedial ∙
+
+  open IsMagma isMagma public
+
+  semimedialˡ : LeftSemimedial ∙
+  semimedialˡ = proj₁ semiMedial
+
+  semimedialʳ : RightSemimedial ∙
+  semimedialʳ = proj₂ semiMedial
 
 record IsSelectiveMagma (∙ : Op₂ A) : Set (a ⊔ ℓ) where
   field
@@ -496,13 +542,32 @@ record IsCancellativeCommutativeSemiring (+ * : Op₂ A) (0# 1# : A) : Set (a �
 
   open IsCommutativeSemiring isCommutativeSemiring public
 
-
-record IsKleeneAlgebra (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+record IsIdempotentSemiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
   field
-    isSemiring  : IsSemiring + * 0# 1#
-    +-idem      : Idempotent +
+    isSemiring     : IsSemiring + * 0# 1#
+    +-idem         : Idempotent +
 
   open IsSemiring isSemiring public
+
+record IsKleeneAlgebra (+ * : Op₂ A) (⋆ : Op₁ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+  field
+    isIdempotentSemiring  : IsIdempotentSemiring + * 0# 1#
+    starExpansive         : StarExpansive 1# + * ⋆
+    starDestructive       : StarDestructive + * ⋆
+
+  open IsIdempotentSemiring isIdempotentSemiring public
+
+  starExpansiveˡ : StarLeftExpansive 1# + * ⋆
+  starExpansiveˡ = proj₁ starExpansive
+
+  starExpansiveʳ : StarRightExpansive 1# + * ⋆
+  starExpansiveʳ = proj₂ starExpansive
+
+  starDestructiveˡ : StarLeftDestructive + * ⋆
+  starDestructiveˡ = proj₁ starDestructive
+
+  starDestructiveʳ : StarRightDestructive + * ⋆
+  starDestructiveʳ = proj₂ starDestructive
 
 record IsQuasiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
   field
@@ -626,6 +691,52 @@ record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ
 ------------------------------------------------------------------------
 -- Structures with 2 binary operations, 1 unary operation & 2 elements
 ------------------------------------------------------------------------
+
+record IsNonAssociativeRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+  field
+    +-isAbelianGroup : IsAbelianGroup + 0# -_
+    *-cong           : Congruent₂ *
+    identity         : Identity 1# *
+    distrib          : * DistributesOver +
+    zero             : Zero 0# *
+
+  open IsAbelianGroup +-isAbelianGroup public
+    renaming
+    ( assoc                   to +-assoc
+    ; ∙-cong                  to +-cong
+    ; ∙-congˡ                 to +-congˡ
+    ; ∙-congʳ                 to +-congʳ
+    ; identity                to +-identity
+    ; identityˡ               to +-identityˡ
+    ; identityʳ               to +-identityʳ
+    ; inverse                 to -‿inverse
+    ; inverseˡ                to -‿inverseˡ
+    ; inverseʳ                to -‿inverseʳ
+    ; ⁻¹-cong                 to -‿cong
+    ; comm                    to +-comm
+    ; isMagma                 to +-isMagma
+    ; isSemigroup             to +-isSemigroup
+    ; isMonoid                to +-isMonoid
+    ; isUnitalMagma           to +-isUnitalMagma
+    ; isCommutativeMagma      to +-isCommutativeMagma
+    ; isCommutativeMonoid     to +-isCommutativeMonoid
+    ; isCommutativeSemigroup  to +-isCommutativeSemigroup
+    ; isInvertibleMagma       to +-isInvertibleMagma
+    ; isInvertibleUnitalMagma to +-isInvertibleUnitalMagma
+    ; isGroup                 to +-isGroup
+    )
+
+  *-isMagma : IsMagma *
+  *-isMagma = record
+    { isEquivalence = isEquivalence
+    ; ∙-cong        = *-cong
+    }
+
+  *-identityˡ : LeftIdentity 1# *
+  *-identityˡ = proj₁ identity
+
+  *-identityʳ : RightIdentity 1# *
+  *-identityʳ = proj₂ identity
 
 record IsNearring (+ * : Op₂ A) (0# 1# : A) (_⁻¹ : Op₁ A) : Set (a ⊔ ℓ) where
   field
@@ -803,3 +914,25 @@ record IsLoop (∙ \\ // : Op₂ A) (ε : A) : Set (a ⊔ ℓ) where
 
   identityʳ : RightIdentity ε ∙
   identityʳ = proj₂ identity
+
+record IsLeftBolLoop (∙ \\ // : Op₂ A) (ε : A) : Set (a ⊔ ℓ) where
+  field
+    isLoop  : IsLoop ∙ \\ //  ε
+    leftBol : LeftBol ∙
+
+  open IsLoop isLoop public
+
+record IsRightBolLoop (∙ \\ // : Op₂ A) (ε : A) : Set (a ⊔ ℓ) where
+  field
+    isLoop   : IsLoop ∙ \\ //  ε
+    rightBol : RightBol ∙
+
+  open IsLoop isLoop public
+
+record IsMoufangLoop (∙ \\ // : Op₂ A) (ε : A) : Set (a ⊔ ℓ) where
+  field
+    isLeftBolLoop  : IsLeftBolLoop ∙ \\ //  ε
+    rightBol       : RightBol ∙
+    identical      : Identical ∙
+
+  open IsLeftBolLoop isLeftBolLoop public

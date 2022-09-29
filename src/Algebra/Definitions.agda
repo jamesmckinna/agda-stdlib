@@ -161,3 +161,54 @@ LeftDivides ∙ \\ = (LeftDividesˡ ∙ \\) × (LeftDividesʳ ∙ \\)
 
 RightDivides : Op₂ A → Op₂ A → Set _
 RightDivides ∙ // = (RightDividesˡ ∙ //) × (RightDividesʳ ∙ //)
+
+StarRightExpansive : A → Op₂ A → Op₂ A → Op₁ A → Set _
+StarRightExpansive e _+_ _∙_ _* = ∀ x → (e + (x ∙ (x *))) ≈ (x *)
+
+StarLeftExpansive : A → Op₂ A → Op₂ A → Op₁ A → Set _
+StarLeftExpansive e _+_ _∙_ _* = ∀ x →  (e + ((x *) ∙ x)) ≈ (x *)
+
+StarExpansive : A → Op₂ A → Op₂ A → Op₁ A → Set _
+StarExpansive e _+_ _∙_ _* = (StarLeftExpansive e _+_ _∙_ _*) × (StarRightExpansive e _+_ _∙_ _*)
+
+StarLeftDestructive : Op₂ A → Op₂ A → Op₁ A → Set _
+StarLeftDestructive _+_ _∙_ _* = ∀ a b x → (b + (a ∙ x)) ≈ x → ((a *) ∙ b) ≈ x
+
+StarRightDestructive : Op₂ A → Op₂ A → Op₁ A → Set _
+StarRightDestructive _+_ _∙_ _* = ∀ a b x → (b + (x ∙ a)) ≈ x → (b ∙ (a *)) ≈ x
+
+StarDestructive : Op₂ A → Op₂ A → Op₁ A → Set _
+StarDestructive _+_ _∙_ _* = (StarLeftDestructive _+_ _∙_ _*) × (StarRightDestructive _+_ _∙_ _*)
+
+LeftAlternative : Op₂ A → Set _
+LeftAlternative _∙_ = ∀ x y  →  ((x ∙ x) ∙ y) ≈ (x ∙ (x ∙ y))
+
+RightAlternative : Op₂ A → Set _
+RightAlternative _∙_ = ∀ x y → (x ∙ (y ∙ y)) ≈ ((x ∙ y) ∙ y)
+
+Alternative : Op₂ A → Set _
+Alternative _∙_ = (LeftAlternative _∙_ ) × (RightAlternative _∙_)
+
+Flexible : Op₂ A → Set _
+Flexible _∙_ = ∀ x y → ((x ∙ y) ∙ x) ≈ (x ∙ (y ∙ x))
+
+Medial : Op₂ A → Set _
+Medial _∙_ = ∀ x y u z → ((x ∙ y) ∙ (u ∙ z)) ≈ ((x ∙ u) ∙ (y ∙ z))
+
+LeftSemimedial : Op₂ A → Set _
+LeftSemimedial _∙_ = ∀ x y z → ((x ∙ x) ∙ (y ∙ z)) ≈ ((x ∙ y) ∙ (x ∙ z))
+
+RightSemimedial : Op₂ A → Set _
+RightSemimedial _∙_ = ∀ x y z → ((y ∙ z) ∙ (x ∙ x)) ≈ ((y ∙ x) ∙ (z ∙ x))
+
+Semimedial : Op₂ A → Set _
+Semimedial _∙_ = (LeftSemimedial _∙_) × (RightSemimedial _∙_)
+
+LeftBol : Op₂ A → Set _
+LeftBol _∙_ = ∀ x y z → (x ∙ (y ∙ (x ∙ z))) ≈ ((x ∙ (y ∙ x)) ∙ z )
+
+RightBol : Op₂ A → Set _
+RightBol _∙_ = ∀ x y z → (((z ∙ x) ∙ y) ∙ x) ≈ (z ∙ ((x ∙ y) ∙ x))
+
+Identical : Op₂ A → Set _
+Identical _∙_ = ∀ x y z → ((z ∙ x) ∙ (y ∙ z)) ≈ (z ∙ ((x ∙ y) ∙ z))

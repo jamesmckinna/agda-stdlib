@@ -23,8 +23,9 @@ open import Data.Nat.Solver
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ-syntax; ∃; ∃₂; ∄; _×_; _,_; map; proj₁; proj₂; uncurry; <_,_>)
 open import Data.Product.Properties using (,-injective)
+open import Data.Product.Algebra using (×-cong)
 open import Data.Sum.Base as Sum using (_⊎_; inj₁; inj₂; [_,_]; [_,_]′)
-open import Data.Sum.Properties using ([,]-map-commute; [,]-∘-distr)
+open import Data.Sum.Properties using ([,]-map; [,]-∘)
 open import Function.Base using (_∘_; id; _$_; flip)
 open import Function.Bundles using (Injection; _↣_; _⇔_; _↔_; mk⇔; mk↔′)
 open import Function.Definitions using (Injective)
@@ -68,6 +69,10 @@ private
 
 1↔⊤ : Fin 1 ↔ ⊤
 1↔⊤ = mk↔′ (λ { 0F → tt }) (λ { tt → 0F }) (λ { tt → refl }) λ { 0F → refl }
+
+2↔Bool : Fin 2 ↔ Bool
+2↔Bool = mk↔′ (λ { 0F → false; 1F → true }) (λ { false → 0F ; true → 1F })
+  (λ { false → refl ; true → refl }) (λ { 0F → refl ; 1F → refl })
 
 ------------------------------------------------------------------------
 -- Properties of _≡_
@@ -451,6 +456,10 @@ inject₁ℕ≤ = ℕₚ.<⇒≤ ∘ inject₁ℕ<
 ℕ<⇒inject₁< : ∀ {i : Fin (ℕ.suc n)} {j : Fin n} → j < i → inject₁ j < i
 ℕ<⇒inject₁< {i = suc i} (s≤s j≤i) = ≤̄⇒inject₁< j≤i
 
+i≤inject₁[j]⇒i≤1+j : i ≤ inject₁ j → i ≤ suc j
+i≤inject₁[j]⇒i≤1+j {i = zero} i≤j = z≤n
+i≤inject₁[j]⇒i≤1+j {i = suc i} {j = suc j} (s≤s i≤j) = s≤s (ℕₚ.≤-step (subst (toℕ i ℕ.≤_) (toℕ-inject₁ j) i≤j))
+
 ------------------------------------------------------------------------
 -- lower₁
 ------------------------------------------------------------------------
@@ -554,8 +563,8 @@ join-splitAt : ∀ m n i → join m n (splitAt m i) ≡ i
 join-splitAt zero    n i       = refl
 join-splitAt (suc m) n zero    = refl
 join-splitAt (suc m) n (suc i) = begin
-  [ _↑ˡ n , (suc m) ↑ʳ_ ]′ (splitAt (suc m) (suc i)) ≡⟨ [,]-map-commute (splitAt m i) ⟩
-  [ suc ∘ (_↑ˡ n) , suc ∘ (m ↑ʳ_) ]′ (splitAt m i)   ≡˘⟨ [,]-∘-distr suc (splitAt m i) ⟩
+  [ _↑ˡ n , (suc m) ↑ʳ_ ]′ (splitAt (suc m) (suc i)) ≡⟨ [,]-map (splitAt m i) ⟩
+  [ suc ∘ (_↑ˡ n) , suc ∘ (m ↑ʳ_) ]′ (splitAt m i)   ≡˘⟨ [,]-∘ suc (splitAt m i) ⟩
   suc ([ _↑ˡ n , m ↑ʳ_ ]′ (splitAt m i))             ≡⟨ cong suc (join-splitAt m n i) ⟩
   suc i                                                         ∎
   where open ≡-Reasoning

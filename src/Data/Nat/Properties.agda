@@ -75,7 +75,7 @@ suc-injective refl = refl
 -- backend erases proofs.
 
 infix 4 _≟_
-_≟_ : Decidable {A = ℕ} _≡_
+_≟_ : DecidableEquality ℕ
 m ≟ n = map′ (≡ᵇ⇒≡ m n) (≡⇒≡ᵇ m n) (T? (m ≡ᵇ n))
 
 ≡-irrelevant : Irrelevant {A = ℕ} _≡_
@@ -267,6 +267,10 @@ n≤1+n _ = ≤-step ≤-refl
 
 n≤0⇒n≡0 : ∀ {n} → n ≤ 0 → n ≡ 0
 n≤0⇒n≡0 z≤n = refl
+
+n≤1⇒n≡0∨n≡1 : ∀ {n : ℕ} → n ≤ 1 → n ≡ 0 ⊎ n ≡ 1
+n≤1⇒n≡0∨n≡1 z≤n       = inj₁ refl
+n≤1⇒n≡0∨n≡1 (s≤s z≤n) = inj₂ refl
 
 ------------------------------------------------------------------------
 -- Properties of _<_
@@ -997,6 +1001,15 @@ m<m*n m@(suc m-1) n@(suc (suc n-2)) (s≤s (s≤s _)) = begin-strict
   n + m-1 * n ≡⟨⟩
   m * n       ∎
 
+m<n⇒m<n*o : ∀ {m n} o .{{_ : NonZero o}} → m < n → m < n * o
+m<n⇒m<n*o {m} {n} o m<n = <-transˡ m<n (m≤m*n n o)
+
+m<n⇒m<o*n : ∀ {m n} o .{{_ : NonZero o}} → m < n → m < o * n
+m<n⇒m<o*n {m} {n} o m<n = begin-strict
+  m     <⟨ m<n⇒m<n*o o m<n ⟩
+  n * o ≡⟨ *-comm n o ⟩
+  o * n ∎
+
 *-cancelʳ-< : RightCancellative _<_ _*_
 *-cancelʳ-< {zero}  zero    (suc o) _     = 0<1+n
 *-cancelʳ-< {suc m} zero    (suc o) _     = 0<1+n
@@ -1061,6 +1074,10 @@ m^n≡1⇒n≡0∨m≡1 m (suc n) eq = inj₂ (m*n≡1⇒m≡1 m (m ^ n) eq)
 
 m^n≢0 : ∀ m n .{{_ : NonZero m}} → NonZero (m ^ n)
 m^n≢0 m n = ≢-nonZero (≢-nonZero⁻¹ m ∘′ m^n≡0⇒m≡0 m n)
+
+2^n>0 : ∀ (n : ℕ) → 2 ^ n > 0
+2^n>0 zero = s≤s z≤n
+2^n>0 (suc n) = ≤-trans (2^n>0 n) (m≤m+n (2 ^ n) ((2 ^ n) + zero))
 
 ------------------------------------------------------------------------
 -- Properties of _⊓_ and _⊔_
@@ -1483,6 +1500,10 @@ m≮m∸n (suc m) (suc n) = m≮m∸n m n ∘ ≤-trans (n≤1+n (suc m))
 ∸-monoʳ-≤ : ∀ {m n} o → m ≤ n → o ∸ m ≥ o ∸ n
 ∸-monoʳ-≤ _ m≤n = ∸-mono ≤-refl m≤n
 
+∸-monoˡ-< : ∀ {m n o} → m < o → n ≤ m → m ∸ n < o ∸ n
+∸-monoˡ-< {m}     {zero}  {o}     m<o       n≤m       = m<o
+∸-monoˡ-< {suc m} {suc n} {suc o} (s≤s m<o) (s≤s n≤m) = ∸-monoˡ-< m<o n≤m
+
 ∸-monoʳ-< : ∀ {m n o} → o < n → n ≤ m → m ∸ n < m ∸ o
 ∸-monoʳ-< {n = suc n} {zero}  (s≤s o<n) (s≤s n<m) = s≤s (m∸n≤m _ n)
 ∸-monoʳ-< {n = suc n} {suc o} (s≤s o<n) (s≤s n<m) = ∸-monoʳ-< o<n n<m
@@ -1883,12 +1904,24 @@ m≤∣m-n∣+n m n = subst (m ≤_) (+-comm n _) (m≤n+∣m-n∣ m n)
 ⌊n/2⌋<n zero    = z<s
 ⌊n/2⌋<n (suc n) = s<s (s≤s (⌊n/2⌋≤n n))
 
+n≡⌊n+n/2⌋ : ∀ n → n ≡ ⌊ n + n /2⌋
+n≡⌊n+n/2⌋ zero          = refl
+n≡⌊n+n/2⌋ (suc zero)    = refl
+n≡⌊n+n/2⌋ (suc (suc n)) =
+  cong suc (trans (n≡⌊n+n/2⌋ _) (cong ⌊_/2⌋ (sym (+-suc n (suc n)))))
+
 ⌈n/2⌉≤n : ∀ n → ⌈ n /2⌉ ≤ n
 ⌈n/2⌉≤n zero    = z≤n
 ⌈n/2⌉≤n (suc n) = s≤s (⌊n/2⌋≤n n)
 
 ⌈n/2⌉<n : ∀ n → ⌈ suc (suc n) /2⌉ < suc (suc n)
 ⌈n/2⌉<n n = s<s (⌊n/2⌋<n n)
+
+n≡⌈n+n/2⌉ : ∀ n → n ≡ ⌈ n + n /2⌉
+n≡⌈n+n/2⌉ zero          = refl
+n≡⌈n+n/2⌉ (suc zero)    = refl
+n≡⌈n+n/2⌉ (suc (suc n)) =
+  cong suc (trans (n≡⌈n+n/2⌉ _) (cong ⌈_/2⌉ (sym (+-suc n (suc n)))))
 
 ------------------------------------------------------------------------
 -- Properties of !_
@@ -2104,7 +2137,7 @@ _>‴?_ = flip _<‴?_
 -- If there is an injection from a type to ℕ, then the type has
 -- decidable equality.
 
-eq? : ∀ {a} {A : Set a} → A ↣ ℕ → Decidable {A = A} _≡_
+eq? : ∀ {a} {A : Set a} → A ↣ ℕ → DecidableEquality A
 eq? inj = via-injection inj _≟_
 
 -- It's possible to decide existential and universal predicates up to
@@ -2242,4 +2275,3 @@ suc[pred[n]]≡n {suc n} _   = refl
 {-# WARNING_ON_USAGE suc[pred[n]]≡n
 "Warning: suc[pred[n]]≡n was deprecated in v2.0. Please use suc-pred instead. Note that the proof now uses instance arguments"
 #-}
-
