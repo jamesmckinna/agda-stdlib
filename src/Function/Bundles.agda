@@ -159,6 +159,9 @@ module _ (From : Setoid a ℓ₁) (To : Setoid b ℓ₂) where
       to-cong   : to Preserves _≈₁_ ⟶ _≈₂_
       from-cong : from Preserves _≈₂_ ⟶ _≈₁_
 
+    to-Func : Func
+    to-Func = record { to = to ; cong = to-cong }
+
 
   record LeftInverse : Set (a ⊔ b ⊔ ℓ₁ ⊔ ℓ₂) where
     field

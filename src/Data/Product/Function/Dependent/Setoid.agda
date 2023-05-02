@@ -11,10 +11,16 @@ module Data.Product.Function.Dependent.Setoid where
 
 open import Data.Product
 open import Data.Product.Relation.Binary.Pointwise.Dependent
+open import Level
 open import Function.Base
-open import Function.Equality as F using (_⟶_; _⟨$⟩_)
+
+open import Function.Bundles using (_⟶_; _⇔_; module Func; Func; Equivalence)
+open Func using () renaming (to to _⟨$⟩_)
+open import Function.Construct.Symmetry using (⇔-sym)
+{-
 open import Function.Equivalence as Eq
   using (Equivalence; _⇔_; module Equivalence)
+-}
 open import Function.Injection as Inj
   using (Injection; Injective; _↣_; module Injection)
 open import Function.Inverse as Inv
@@ -29,6 +35,15 @@ open import Relation.Binary.Indexed.Heterogeneous
 open import Relation.Binary.Indexed.Heterogeneous.Construct.At
   using (_atₛ_)
 open import Relation.Binary.PropositionalEquality as P using (_≡_)
+
+private
+  variable
+    a₁ a₂ b₁ b₁′ b₂ b₂′ : Level
+    A₁ : Set a₁
+    A₂ : Set a₂
+    B₁ : IndexedSetoid A₁ b₁ b₁′
+    B₂ : IndexedSetoid A₂ b₂ b₂′
+
 
 ------------------------------------------------------------------------
 -- Properties related to "relatedness"
@@ -45,10 +60,11 @@ private
 ⟶ : ∀ {a₁ a₂ b₁ b₁′ b₂ b₂′}
       {A₁ : Set a₁} {A₂ : Set a₂}
       {B₁ : IndexedSetoid A₁ b₁ b₁′} (B₂ : IndexedSetoid A₂ b₂ b₂′)
-    (f : A₁ → A₂) → (∀ {x} → (B₁ atₛ x) ⟶ (B₂ atₛ (f x))) →
-    setoid (P.setoid A₁) B₁ ⟶ setoid (P.setoid A₂) B₂
-⟶ {A₁ = A₁} {A₂} {B₁} B₂ f g = record
-  { _⟨$⟩_ = fg
+    (f : A₁ → A₂) → (∀ {x : A₁} → Func (B₁ atₛ x) (B₂ atₛ (f x))) →
+    Func (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
+⟶ {A₁ = A₁} {A₂} {B₁} B₂ f g = 
+  record
+  { to = fg
   ; cong  = fg-cong
   }
   where
@@ -61,21 +77,25 @@ private
   fg = map f (_⟨$⟩_ g)
 
   fg-cong : _≈₁_ =[ fg ]⇒ _≈₂_
-  fg-cong (P.refl , ∼) = (P.refl , F.cong g ∼)
+  fg-cong (P.refl , ∼) = (P.refl , Func.cong g ∼)
 
+module _ (A₁⇔A₂ : A₁ ⇔ A₂) where
 
-module _ {a₁ a₂ b₁ b₁′ b₂ b₂′} {A₁ : Set a₁} {A₂ : Set a₂} where
+  open Equivalence
+  A₂⇔A₁ : A₂ ⇔ A₁
+  A₂⇔A₁ = ⇔-sym A₁⇔A₂
+  from-Func = to-Func A₂⇔A₁
 
-  equivalence : {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b₂ b₂′}
-    (A₁⇔A₂ : A₁ ⇔ A₂) →
-    (∀ {x} → _⟶_ (B₁ atₛ x) (B₂ atₛ (Equivalence.to   A₁⇔A₂ ⟨$⟩ x))) →
-    (∀ {y} → _⟶_ (B₂ atₛ y) (B₁ atₛ (Equivalence.from A₁⇔A₂ ⟨$⟩ y))) →
-    Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
-  equivalence {B₁} {B₂} A₁⇔A₂ B-to B-from = record
+  equivalence : 
+    (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ {!to-Func   A₁⇔A₂ ⟨$⟩ x!})) →
+    (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ {!Equivalence.from A₁⇔A₂ ⟨$⟩ y!})) →
+    {!Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)!}
+  equivalence B-to B-from = {!record
     { to   = ⟶ B₂ (_⟨$⟩_ (to   A₁⇔A₂)) B-to
     ; from = ⟶ B₁ (_⟨$⟩_ (from A₁⇔A₂)) B-from
-    } where open Equivalence
+    } where open Equivalence!}
 
+{-
   equivalence-↞ : (B₁ : IndexedSetoid A₁ b₁ b₁′) {B₂ : IndexedSetoid A₂ b₂ b₂′}
     (A₁↞A₂ : A₁ ↞ A₂) →
     (∀ {x} → Equivalence (B₁ atₛ (LeftInverse.from A₁↞A₂ ⟨$⟩ x))
@@ -90,7 +110,7 @@ module _ {a₁ a₂ b₁ b₁′ b₂ b₂′} {A₁ : Set a₁} {A₂ : Set a�
                       P.subst (IndexedSetoid.Carrier B₁)
                          (P.sym $ LeftInverse.left-inverse-of A₁↞A₂ _)
                          x
-      ; cong  = F.cong (Equivalence.to B₁⇔B₂) ∘
+      ; cong  = Func.cong (Equivalence.to B₁⇔B₂) ∘
               subst-cong (λ {x} → IndexedSetoid._≈_ B₁ {x} {x})
                          (P.sym (LeftInverse.left-inverse-of A₁↞A₂ _))
       }
@@ -114,10 +134,11 @@ module _ {a₁ a₂ b₁ b₁′ b₂ b₂′} {A₁ : Set a₁} {A₂ : Set a�
                       P.subst (IndexedSetoid.Carrier B₂)
                          (P.sym $ Surjection.right-inverse-of A₁↠A₂ _)
                          x
-      ; cong  = F.cong (Equivalence.from B₁⇔B₂) ∘
+      ; cong  = Func.cong (Equivalence.from B₁⇔B₂) ∘
               subst-cong (λ {x} → IndexedSetoid._≈_ B₂ {x} {x})
                          (P.sym (Surjection.right-inverse-of A₁↠A₂ _))
       }
+
 
   injection : {B₁ : IndexedSetoid A₁ b₁ b₁′} (B₂ : IndexedSetoid A₂ b₂ b₂′) →
     (A₁↣A₂ : A₁ ↣ A₂) →
@@ -195,3 +216,4 @@ module _ {a₁ a₂ b₁ b₁′ b₂ b₂′} {A₁ : Set a₁} {A₂ : Set a�
       lemma P.refl = IndexedSetoid.refl B₂
 
   -- See also Data.Product.Function.Dependent.Setoid.WithK.inverse.
+-}
