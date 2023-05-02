@@ -41,8 +41,6 @@ private
     a₁ a₂ b₁ b₁′ b₂ b₂′ : Level
     A₁ : Set a₁
     A₂ : Set a₂
-    B₁ : IndexedSetoid A₁ b₁ b₁′
-    B₂ : IndexedSetoid A₂ b₂ b₂′
 
 
 ------------------------------------------------------------------------
@@ -81,21 +79,24 @@ private
 
 module _ (A₁⇔A₂ : A₁ ⇔ A₂) where
 
-  open Equivalence
+  to-Func = Equivalence.to-Func A₁⇔A₂
+  open Func to-Func renaming (to to toA; cong to to-congA)
   A₂⇔A₁ : A₂ ⇔ A₁
   A₂⇔A₁ = ⇔-sym A₁⇔A₂
-  from-Func = to-Func A₂⇔A₁
+  from-Func = Equivalence.to-Func A₂⇔A₁
+  open Func from-Func renaming (to to fromA; cong to from-congA)
 
-  equivalence : 
-    (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ {!to-Func   A₁⇔A₂ ⟨$⟩ x!})) →
-    (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ {!Equivalence.from A₁⇔A₂ ⟨$⟩ y!})) →
-    {!Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)!}
-  equivalence B-to B-from = {!record
-    { to   = ⟶ B₂ (_⟨$⟩_ (to   A₁⇔A₂)) B-to
-    ; from = ⟶ B₁ (_⟨$⟩_ (from A₁⇔A₂)) B-from
-    } where open Equivalence!}
+  equivalence : {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b₂ b₂′} →
+    (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (to-Func ⟨$⟩ x))) →
+    (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (from-Func ⟨$⟩ y))) →
+    Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
+  equivalence B-to B-from = record { to = {!B-to!} ; from = {!!} ; to-cong = {!!} ; from-cong = {!!} } where open Func
 
 {-
+record
+    { to   = ⟶ B₂ (_⟨$⟩_ (to   A₁⇔A₂)) B-to
+    ; from = ⟶ B₁ (_⟨$⟩_ (from A₁⇔A₂)) B-from
+    } where open Equivalence
   equivalence-↞ : (B₁ : IndexedSetoid A₁ b₁ b₁′) {B₂ : IndexedSetoid A₂ b₂ b₂′}
     (A₁↞A₂ : A₁ ↞ A₂) →
     (∀ {x} → Equivalence (B₁ atₛ (LeftInverse.from A₁↞A₂ ⟨$⟩ x))
