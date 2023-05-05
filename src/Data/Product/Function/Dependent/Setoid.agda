@@ -90,11 +90,19 @@ module _ (A₁⇔A₂ : A₁ ⇔ A₂) where
     (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (to-Func ⟨$⟩ x))) →
     (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (from-Func ⟨$⟩ y))) →
     Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
-  equivalence B-to B-from = record { to = {!B-to!} ; from = {!!} ; to-cong = {!!} ; from-cong = {!!} } where open Func
+  equivalence {B₁ = B₁} {B₂ = B₂} B-to B-from = record
+    { to = toB 
+    ; from = fromB
+    ; to-cong = to-congB
+    ; from-cong = from-congB
+    } where
+        open Func (⟶ {B₁ = B₁} B₂ toA B-to) renaming (to to toB; cong to to-congB)
+        open Func (⟶ {B₁ = B₂} B₁ fromA B-from) renaming (to to fromB; cong to from-congB)
+
 
 {-
 record
-    { to   = ⟶ B₂ (_⟨$⟩_ (to   A₁⇔A₂)) B-to
+    { to   = ⟶ B₂ w(_⟨$⟩_ (to   A₁⇔A₂)) B-to
     ; from = ⟶ B₁ (_⟨$⟩_ (from A₁⇔A₂)) B-from
     } where open Equivalence
   equivalence-↞ : (B₁ : IndexedSetoid A₁ b₁ b₁′) {B₂ : IndexedSetoid A₂ b₂ b₂′}
