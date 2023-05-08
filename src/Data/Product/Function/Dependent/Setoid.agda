@@ -58,25 +58,27 @@ private
                P x y → P (P.subst A i≡i′ x) (P.subst A i≡i′ y)
   subst-cong P P.refl p = p
 
-⟶ : {B₁ : IndexedSetoid A₁ b₁ b₁′} (B₂ : IndexedSetoid A₂ b₂ b₂′)
-    (f : A₁ → A₂) → (∀ {x : A₁} → Func (B₁ atₛ x) (B₂ atₛ (f x))) →
-    Func (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
-⟶ {A₁ = A₁} {A₂ = A₂} {B₁ = B₁} B₂ f g = 
-  record
-  { to = fg
-  ; cong  = fg-cong
-  }
-  where
-  open B.Setoid (setoid (P.setoid A₁) B₁)
-    using () renaming (_≈_ to _≈₁_)
-  open B.Setoid (setoid (P.setoid A₂) B₂)
-    using () renaming (_≈_ to _≈₂_)
-  open B using (_=[_]⇒_)
 
-  fg = map f (_⟨$⟩_ g)
+module _ (B₁ : IndexedSetoid A₁ b₁ b₁′) (B₂ : IndexedSetoid A₂ b₂ b₂′) where
 
-  fg-cong : _≈₁_ =[ fg ]⇒ _≈₂_
-  fg-cong (P.refl , ∼) = (P.refl , Func.cong g ∼)
+  ⟶ : (f : A₁ → A₂) → (∀ {x : A₁} → Func (B₁ atₛ x) (B₂ atₛ (f x))) →
+       Func (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
+  ⟶ f g = 
+    record
+    { to = fg
+    ; cong  = fg-cong
+    }
+    where
+    open B.Setoid (setoid (P.setoid A₁) B₁)
+      using () renaming (_≈_ to _≈₁_)
+    open B.Setoid (setoid (P.setoid A₂) B₂)
+      using () renaming (_≈_ to _≈₂_)
+    open B using (_=[_]⇒_)
+
+    fg = map f (_⟨$⟩_ g)
+
+    fg-cong : _≈₁_ =[ fg ]⇒ _≈₂_
+    fg-cong (P.refl , ∼) = (P.refl , Func.cong g ∼)
 
 module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b₂ b₂′} where
 
@@ -99,8 +101,8 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
       ; to-cong = to-congB
       ; from-cong = from-congB
       } where
-        open Func (⟶ {B₁ = B₁} B₂ toA B-to) renaming (to to toB; cong to to-congB)
-        open Func (⟶ {B₁ = B₂} B₁ fromA B-from) renaming (to to fromB; cong to from-congB)
+        open Func (⟶ B₁ B₂ toA B-to) renaming (to to toB; cong to to-congB)
+        open Func (⟶ B₂ B₁ fromA B-from) renaming (to to fromB; cong to from-congB)
 
 
   module _ (A₁↩A₂ : A₁ ↩ A₂) where
