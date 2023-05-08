@@ -12,6 +12,7 @@ module Data.Product.Function.Dependent.Setoid.WithK where
 open import Data.Product
 open import Data.Product.Function.Dependent.Setoid using (surjection)
 open import Data.Product.Relation.Binary.Pointwise.Dependent
+open import Level
 open import Relation.Binary
 open import Function.Base
 open import Function.Equality as F using (_⟶_; _⟨$⟩_)
@@ -32,15 +33,21 @@ open import Relation.Binary.Indexed.Heterogeneous.Construct.At
   using (_atₛ_)
 open import Relation.Binary.PropositionalEquality as P using (_≡_)
 
+private
+  variable
+    a₁ a₂ b₁ b₁′ b₂ b₂′ : Level
+    A₁ : Set a₁
+    A₂ : Set a₂
+
+
 ------------------------------------------------------------------------
 -- Combinator for Inverse
 
-module _ {a₁ a₂ b₁ b₁′ b₂ b₂′} {A₁ : Set a₁} {A₂ : Set a₂} where
+module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} (B₂ : IndexedSetoid A₂ b₂ b₂′) where
 
-  inverse : {B₁ : IndexedSetoid A₁ b₁ b₁′} (B₂ : IndexedSetoid A₂ b₂ b₂′) →
-    (A₁↔A₂ : A₁ ↔ A₂) →
-    (∀ {x} → Inverse (B₁ atₛ x) (B₂ atₛ (Inverse.to A₁↔A₂ ⟨$⟩ x))) →
-    Inverse (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
+  inverse : (A₁↔A₂ : A₁ ↔ A₂) →
+            (∀ {x} → Inverse (B₁ atₛ x) (B₂ atₛ (Inverse.to A₁↔A₂ ⟨$⟩ x))) →
+            Inverse (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
   inverse {B₁} B₂ A₁↔A₂ B₁↔B₂ = record
     { to         = Surjection.to   surj
     ; from       = Surjection.from surj
