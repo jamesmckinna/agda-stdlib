@@ -84,35 +84,54 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
 
   module _ (A₁⇔A₂ : A₁ ⇔ A₂) where
 
-    to-Func = Equivalence.to-Func A₁⇔A₂
-    open Func to-Func renaming (to to toA; cong to to-congA)
-    A₂⇔A₁ : A₂ ⇔ A₁
-    A₂⇔A₁ = ⇔-sym A₁⇔A₂
-    from-Func = Equivalence.to-Func A₂⇔A₁
-    open Func from-Func renaming (to to fromA; cong to from-congA)
+    open Func (Equivalence.to-Func A₁⇔A₂) using () renaming (to to toA)
+    open Func (Equivalence.to-Func (⇔-sym A₁⇔A₂)) using () renaming (to to fromA)
 
-    equivalence : 
-      (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (to-Func ⟨$⟩ x))) →
-      (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (from-Func ⟨$⟩ y))) →
+    equivalence :
+      (∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (toA x))) →
+      (∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (fromA y))) →
       Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
     equivalence B-to B-from = record
-      { to = toB 
-      ; from = fromB
-      ; to-cong = to-congB
-      ; from-cong = from-congB
+      { to = to
+      ; from = from
+      ; to-cong = to-cong
+      ; from-cong = from-cong
       } where
-        open Func (⟶ B₁ B₂ toA B-to) renaming (to to toB; cong to to-congB)
-        open Func (⟶ B₂ B₁ fromA B-from) renaming (to to fromB; cong to from-congB)
+        open Func (⟶ B₁ B₂ toA B-to) renaming (to to to; cong to to-cong)
+        open Func (⟶ B₂ B₁ fromA B-from) renaming (to to from; cong to from-cong)
 
 
   module _ (A₁↩A₂ : A₁ ↩ A₂) where
-{-
 
-    equivalence-↞ :
-      (∀ {x} → Equivalence (B₁ atₛ (LeftInverse.from A₁↞A₂ ⟨$⟩ x)) (B₂ atₛ x)) →
+    open LeftInverse A₁↩A₂ using (inverseˡ)
+      renaming (to to toA; to-cong to to-congA; from to fromA; from-cong to from-congA; equivalence to A₁⇔A₂)
+
+    equivalence-↩ :
+      (∀ {x} → Equivalence (B₁ atₛ (fromA x)) (B₂ atₛ x)) →
       Equivalence (setoid (P.setoid A₁) B₁) (setoid (P.setoid A₂) B₂)
-    equivalence-↞ B₁ {B₂} A₁↞A₂ B₁⇔B₂ =
-      equivalence (LeftInverse.equivalence A₁↞A₂) B-to B-from
+    equivalence-↩ B₁⇔B₂ = equivalence A₁⇔A₂ B-to B-from
+      where
+        B₂⇔B₁ : ∀ {x} → Equivalence (B₂ atₛ toA x) (B₁ atₛ x)
+        B₂⇔B₁ {x} = record { to = {!!} ; from = {!!} ; to-cong = {!!} ; from-cong = {!!} }
+          
+        B-to : ∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (toA x))
+        B-to {x} = record { to = fromB ; cong = from-congB }
+          where
+            open Equivalence (B₂⇔B₁ {x})
+              renaming (to to toB; from to fromB; to-cong to to-congB; from-cong to from-congB)
+{-
+            toB-toA : Setoid.Carrier (B₁ atₛ x) → Setoid.Carrier (B₂ atₛ toA x)
+            toB-toA b = fromB b
+            toB-congB : fromB Preserves Setoid._≈_ (B₁ atₛ x) ⟶ Setoid._≈_ (B₂ atₛ toA x)
+            toB-congB eq = from-congB eq
+            --inverseˡ (toA x) rewrite P.sym (inverseˡ (toA x))
+-}
+        B-from : ∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (fromA y))
+        B-from {y} = record { to = from ; cong = from-cong }
+          where open Equivalence (B₁⇔B₂ {y})
+        
+{-  LeftInverse.from A₁↩A₂
+      equivalence (LeftInverse.equivalence A₁↩A₂) B-to B-from
       where
       B-to : ∀ {x} → _⟶_ (B₁ atₛ x) (B₂ atₛ (LeftInverse.to A₁↞A₂ ⟨$⟩ x))
       B-to = record
@@ -125,8 +144,8 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
                          (P.sym (LeftInverse.left-inverse-of A₁↞A₂ _))
         }
 
-    B-from : ∀ {y} → _⟶_ (B₂ atₛ y) (B₁ atₛ (LeftInverse.from A₁↞A₂ ⟨$⟩ y))
-    B-from = Equivalence.from B₁⇔B₂
+      B-from : ∀ {y} → _⟶_ (B₂ atₛ y) (B₁ atₛ (LeftInverse.from A₁↞A₂ ⟨$⟩ y))
+      B-from = Equivalence.from B₁⇔B₂
 -}
 
   module _ (A₁↠A₂ : A₁ ↠ A₂) where
