@@ -115,26 +115,22 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
         B₂⇔B₁ {x} = record
           { to = λ b[toA[x]] → {!!}
           ; from = λ b[x] → {!!}
-          ; to-cong = {! P.sym (inverseˡ (toA x))!}
-          ; from-cong = λ bx≈y → to-cong {!!} }
+          ; to-cong = {! !}
+          ; from-cong = λ b[x]≈y → {!!} }
           where
             open Equivalence (B₁⇔B₂ {toA x})
-            to-lem : ∀ {x y} → toA x ≡ toA y → x ≡ y
-            to-lem eq = {!!}
-            from-lem : ∀ {x y} → fromA x ≡ fromA y → x ≡ y
-            from-lem eq = {!!}
+            open P.≡-Reasoning
+            lem : ∀ {x y} → toA (fromA (toA x)) ≡ toA (fromA (toA y)) → toA x ≡ toA y
+            lem {x} {y} eq = begin
+              toA x ≡˘⟨ inverseˡ (toA x) ⟩
+              toA (fromA (toA x)) ≡⟨ eq ⟩
+              toA (fromA (toA y)) ≡⟨ inverseˡ (toA y) ⟩
+              toA y ∎
+            -- uses (inverseˡ (toA x), but this is trival anyway
           
         B-to : ∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (toA x))
         B-to {x} = record { to = from ; cong = from-cong }
-          where
-            open Equivalence (B₂⇔B₁ {x})
-{-
-            toB-toA : Setoid.Carrier (B₁ atₛ x) → Setoid.Carrier (B₂ atₛ toA x)
-            toB-toA b = fromB b
-            toB-congB : fromB Preserves Setoid._≈_ (B₁ atₛ x) ⟶ Setoid._≈_ (B₂ atₛ toA x)
-            toB-congB eq = from-congB eq
-            --inverseˡ (toA x) rewrite P.sym (inverseˡ (toA x))
--}
+          where open Equivalence (B₂⇔B₁ {x})
         B-from : ∀ {y} → Func (B₂ atₛ y) (B₁ atₛ (fromA y))
         B-from {y} = record { to = from ; cong = from-cong }
           where open Equivalence (B₁⇔B₂ {y})
