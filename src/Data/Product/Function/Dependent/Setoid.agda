@@ -103,8 +103,13 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
 
   module _ (A₁↩A₂ : A₁ ↩ A₂) where
 
-    open LeftInverse A₁↩A₂ using (inverseˡ)
-      renaming (to to toA; to-cong to to-congA; from to fromA; from-cong to from-congA; equivalence to A₁⇔A₂)
+    open LeftInverse A₁↩A₂
+      using (inverseˡ)
+      renaming ( to to toA
+               ; to-cong to to-congA
+               ; from to fromA
+               ; from-cong to from-congA
+               ; equivalence to A₁⇔A₂)
 
     equivalence-↩ :
       (∀ {x} → Equivalence (B₁ atₛ (fromA x)) (B₂ atₛ x)) →
@@ -114,12 +119,16 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
         B₂⇔B₁ : ∀ {x} → Equivalence (B₂ atₛ toA x) (B₁ atₛ x)
         B₂⇔B₁ {x} = record
           { to = λ b[toA[x]] → {!!}
-          ; from = λ b[x] → {!!}
+          ; from = λ b[x] → toB {!!}
           ; to-cong = λ b[toA[x]]≈y → {!!}
-          ; from-cong = λ b[x]≈y → {!!} }
+          ; from-cong = λ b[x]≈y → to-congB {!!} } -- should be refl???
           where
-            open Equivalence (B₁⇔B₂ {toA x})
             open P.≡-Reasoning
+            open Equivalence (B₁⇔B₂ {toA x})
+              renaming ( to to toB
+                       ; to-cong to to-congB
+                       ; from to fromB
+                       ; from-cong to from-congB)
             lem : ∀ {x y} → toA (fromA (toA x)) ≡ toA (fromA (toA y)) → toA x ≡ toA y
             lem {x} {y} eq = begin
               toA x ≡˘⟨ inverseˡ (toA x) ⟩
