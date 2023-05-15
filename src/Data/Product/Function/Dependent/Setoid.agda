@@ -115,7 +115,7 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
         B₂⇔B₁ {x} = record
           { to = λ b[toA[x]] → {!!}
           ; from = λ b[x] → {!!}
-          ; to-cong = {! !}
+          ; to-cong = λ b[toA[x]]≈y → {!!}
           ; from-cong = λ b[x]≈y → {!!} }
           where
             open Equivalence (B₁⇔B₂ {toA x})
@@ -126,7 +126,6 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
               toA (fromA (toA x)) ≡⟨ eq ⟩
               toA (fromA (toA y)) ≡⟨ inverseˡ (toA y) ⟩
               toA y ∎
-            -- uses (inverseˡ (toA x), but this is trival anyway
           
         B-to : ∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (toA x))
         B-to {x} = record { to = from ; cong = from-cong }
