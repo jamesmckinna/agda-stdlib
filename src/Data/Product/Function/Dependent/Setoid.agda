@@ -112,13 +112,22 @@ module _ {B₁ : IndexedSetoid A₁ b₁ b₁′} {B₂ : IndexedSetoid A₂ b�
     equivalence-↩ B₁⇔B₂ = equivalence A₁⇔A₂ B-to B-from
       where
         B₂⇔B₁ : ∀ {x} → Equivalence (B₂ atₛ toA x) (B₁ atₛ x)
-        B₂⇔B₁ {x} = record { to = {!!} ; from = {!!} ; to-cong = {!!} ; from-cong = {!!} }
+        B₂⇔B₁ {x} = record
+          { to = λ b[toA[x]] → {!!}
+          ; from = λ b[x] → {!!}
+          ; to-cong = {! P.sym (inverseˡ (toA x))!}
+          ; from-cong = λ bx≈y → to-cong {!!} }
+          where
+            open Equivalence (B₁⇔B₂ {toA x})
+            to-lem : ∀ {x y} → toA x ≡ toA y → x ≡ y
+            to-lem eq = {!!}
+            from-lem : ∀ {x y} → fromA x ≡ fromA y → x ≡ y
+            from-lem eq = {!!}
           
         B-to : ∀ {x} → Func (B₁ atₛ x) (B₂ atₛ (toA x))
-        B-to {x} = record { to = fromB ; cong = from-congB }
+        B-to {x} = record { to = from ; cong = from-cong }
           where
             open Equivalence (B₂⇔B₁ {x})
-              renaming (to to toB; from to fromB; to-cong to to-congB; from-cong to from-congB)
 {-
             toB-toA : Setoid.Carrier (B₁ atₛ x) → Setoid.Carrier (B₂ atₛ toA x)
             toB-toA b = fromB b
