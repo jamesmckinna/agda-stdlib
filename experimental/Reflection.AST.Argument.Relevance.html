@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Reflection.AST.Argument.Relevance</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Comment">------------------------------------------------------------------------</a>
+<a id="74" class="Comment">-- The Agda standard library</a>
+<a id="103" class="Comment">--</a>
+<a id="106" class="Comment">-- Argument relevance used in the reflection machinery</a>
+<a id="161" class="Comment">------------------------------------------------------------------------</a>
+
+<a id="235" class="Symbol">{-#</a> <a id="239" class="Keyword">OPTIONS</a> <a id="247" class="Pragma">--cubical-compatible</a> <a id="268" class="Pragma">--safe</a> <a id="275" class="Symbol">#-}</a>
+
+<a id="280" class="Keyword">module</a> <a id="287" href="Reflection.AST.Argument.Relevance.html" class="Module">Reflection.AST.Argument.Relevance</a> <a id="321" class="Keyword">where</a>
+
+<a id="328" class="Keyword">open</a> <a id="333" class="Keyword">import</a> <a id="340" href="Relation.Nullary.html" class="Module">Relation.Nullary</a>
+<a id="357" class="Keyword">open</a> <a id="362" class="Keyword">import</a> <a id="369" href="Relation.Binary.html" class="Module">Relation.Binary</a>
+<a id="385" class="Keyword">open</a> <a id="390" class="Keyword">import</a> <a id="397" href="Relation.Binary.PropositionalEquality.html" class="Module">Relation.Binary.PropositionalEquality</a>
+
+<a id="436" class="Comment">------------------------------------------------------------------------</a>
+<a id="509" class="Comment">-- Re-exporting the builtins publicly</a>
+
+<a id="548" class="Keyword">open</a> <a id="553" class="Keyword">import</a> <a id="560" href="Agda.Builtin.Reflection.html" class="Module">Agda.Builtin.Reflection</a> <a id="584" class="Keyword">public</a> <a id="591" class="Keyword">using</a> <a id="597" class="Symbol">(</a><a id="598" href="Agda.Builtin.Reflection.html#2978" class="Datatype">Relevance</a><a id="607" class="Symbol">)</a>
+<a id="609" class="Keyword">open</a> <a id="614" href="Agda.Builtin.Reflection.html#2978" class="Module">Relevance</a> <a id="624" class="Keyword">public</a>
+
+<a id="632" class="Comment">------------------------------------------------------------------------</a>
+<a id="705" class="Comment">-- Decidable equality</a>
+
+<a id="_≟_"></a><a id="728" href="Reflection.AST.Argument.Relevance.html#728" class="Function Operator">_≟_</a> <a id="732" class="Symbol">:</a> <a id="734" href="Relation.Binary.Definitions.html#6152" class="Function">DecidableEquality</a> <a id="752" href="Agda.Builtin.Reflection.html#2978" class="Datatype">Relevance</a>
+<a id="762" href="Agda.Builtin.Reflection.html#3002" class="InductiveConstructor">relevant</a>   <a id="773" href="Reflection.AST.Argument.Relevance.html#728" class="Function Operator">≟</a> <a id="775" href="Agda.Builtin.Reflection.html#3002" class="InductiveConstructor">relevant</a>   <a id="786" class="Symbol">=</a> <a id="788" href="Relation.Nullary.html#1657" class="InductiveConstructor">yes</a> <a id="792" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a>
+<a id="797" href="Agda.Builtin.Reflection.html#3011" class="InductiveConstructor">irrelevant</a> <a id="808" href="Reflection.AST.Argument.Relevance.html#728" class="Function Operator">≟</a> <a id="810" href="Agda.Builtin.Reflection.html#3011" class="InductiveConstructor">irrelevant</a> <a id="821" class="Symbol">=</a> <a id="823" href="Relation.Nullary.html#1657" class="InductiveConstructor">yes</a> <a id="827" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a>
+<a id="832" href="Agda.Builtin.Reflection.html#3002" class="InductiveConstructor">relevant</a>   <a id="843" href="Reflection.AST.Argument.Relevance.html#728" class="Function Operator">≟</a> <a id="845" href="Agda.Builtin.Reflection.html#3011" class="InductiveConstructor">irrelevant</a> <a id="856" class="Symbol">=</a> <a id="858" href="Relation.Nullary.html#1694" class="InductiveConstructor">no</a> <a id="861" class="Symbol">λ()</a>
+<a id="865" href="Agda.Builtin.Reflection.html#3011" class="InductiveConstructor">irrelevant</a> <a id="876" href="Reflection.AST.Argument.Relevance.html#728" class="Function Operator">≟</a> <a id="878" href="Agda.Builtin.Reflection.html#3002" class="InductiveConstructor">relevant</a>   <a id="889" class="Symbol">=</a> <a id="891" href="Relation.Nullary.html#1694" class="InductiveConstructor">no</a> <a id="894" class="Symbol">λ()</a>
+</pre></body></html>

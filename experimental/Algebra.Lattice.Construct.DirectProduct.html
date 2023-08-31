@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Algebra.Lattice.Construct.DirectProduct</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Comment">------------------------------------------------------------------------</a>
+<a id="74" class="Comment">-- The Agda standard library</a>
+<a id="103" class="Comment">--</a>
+<a id="106" class="Comment">-- Instances of algebraic structures made by taking two other instances</a>
+<a id="178" class="Comment">-- A and B, and having elements of the new instance be pairs |A| × |B|.</a>
+<a id="250" class="Comment">-- In mathematics, this would usually be written A × B or A ⊕ B.</a>
+<a id="315" class="Comment">--</a>
+<a id="318" class="Comment">-- From semigroups up, these new instances are products of the relevant</a>
+<a id="390" class="Comment">-- category. For structures with commutative addition (commutative</a>
+<a id="457" class="Comment">-- monoids, Abelian groups, semirings, rings), the direct product is</a>
+<a id="526" class="Comment">-- also the coproduct, making it a biproduct.</a>
+<a id="572" class="Comment">------------------------------------------------------------------------</a>
+
+<a id="646" class="Symbol">{-#</a> <a id="650" class="Keyword">OPTIONS</a> <a id="658" class="Pragma">--cubical-compatible</a> <a id="679" class="Pragma">--safe</a> <a id="686" class="Symbol">#-}</a>
+
+<a id="691" class="Keyword">open</a> <a id="696" class="Keyword">import</a> <a id="703" href="Algebra.html" class="Module">Algebra</a>
+<a id="711" class="Keyword">open</a> <a id="716" class="Keyword">import</a> <a id="723" href="Algebra.Lattice.html" class="Module">Algebra.Lattice</a>
+<a id="739" class="Keyword">import</a> <a id="746" href="Algebra.Construct.DirectProduct.html" class="Module">Algebra.Construct.DirectProduct</a> <a id="778" class="Symbol">as</a> <a id="781" class="Module">DirectProduct</a>
+<a id="795" class="Keyword">open</a> <a id="800" class="Keyword">import</a> <a id="807" href="Data.Product.html" class="Module">Data.Product</a>
+<a id="820" class="Keyword">open</a> <a id="825" class="Keyword">import</a> <a id="832" href="Data.Product.Relation.Binary.Pointwise.NonDependent.html" class="Module">Data.Product.Relation.Binary.Pointwise.NonDependent</a>
+<a id="884" class="Keyword">open</a> <a id="889" class="Keyword">import</a> <a id="896" href="Level.html" class="Module">Level</a> <a id="902" class="Keyword">using</a> <a id="908" class="Symbol">(</a><a id="909" href="Agda.Primitive.html#591" class="Postulate">Level</a><a id="914" class="Symbol">;</a> <a id="916" href="Agda.Primitive.html#804" class="Primitive Operator">_⊔_</a><a id="919" class="Symbol">)</a>
+
+<a id="922" class="Keyword">module</a> <a id="929" href="Algebra.Lattice.Construct.DirectProduct.html" class="Module">Algebra.Lattice.Construct.DirectProduct</a> <a id="969" class="Keyword">where</a>
+
+<a id="976" class="Keyword">private</a>
+  <a id="986" class="Keyword">variable</a>
+    <a id="999" href="Algebra.Lattice.Construct.DirectProduct.html#999" class="Generalizable">a</a> <a id="1001" href="Algebra.Lattice.Construct.DirectProduct.html#1001" class="Generalizable">b</a> <a id="1003" href="Algebra.Lattice.Construct.DirectProduct.html#1003" class="Generalizable">ℓ₁</a> <a id="1006" href="Algebra.Lattice.Construct.DirectProduct.html#1006" class="Generalizable">ℓ₂</a> <a id="1009" class="Symbol">:</a> <a id="1011" href="Agda.Primitive.html#591" class="Postulate">Level</a>
+
+<a id="1018" class="Comment">------------------------------------------------------------------------</a>
+<a id="1091" class="Comment">-- Bundles</a>
+
+<a id="semilattice"></a><a id="1103" href="Algebra.Lattice.Construct.DirectProduct.html#1103" class="Function">semilattice</a> <a id="1115" class="Symbol">:</a> <a id="1117" href="Algebra.Lattice.Bundles.html#801" class="Record">Semilattice</a> <a id="1129" href="Algebra.Lattice.Construct.DirectProduct.html#999" class="Generalizable">a</a> <a id="1131" href="Algebra.Lattice.Construct.DirectProduct.html#1003" class="Generalizable">ℓ₁</a> <a id="1134" class="Symbol">→</a> <a id="1136" href="Algebra.Lattice.Bundles.html#801" class="Record">Semilattice</a> <a id="1148" href="Algebra.Lattice.Construct.DirectProduct.html#1001" class="Generalizable">b</a> <a id="1150" href="Algebra.Lattice.Construct.DirectProduct.html#1006" class="Generalizable">ℓ₂</a> <a id="1153" class="Symbol">→</a>
+              <a id="1169" href="Algebra.Lattice.Bundles.html#801" class="Record">Semilattice</a> <a id="1181" class="Symbol">(</a><a id="1182" href="Algebra.Lattice.Construct.DirectProduct.html#999" class="Generalizable">a</a> <a id="1184" href="Agda.Primitive.html#804" class="Primitive Operator">⊔</a> <a id="1186" href="Algebra.Lattice.Construct.DirectProduct.html#1001" class="Generalizable">b</a><a id="1187" class="Symbol">)</a> <a id="1189" class="Symbol">(</a><a id="1190" href="Algebra.Lattice.Construct.DirectProduct.html#1003" class="Generalizable">ℓ₁</a> <a id="1193" href="Agda.Primitive.html#804" class="Primitive Operator">⊔</a> <a id="1195" href="Algebra.Lattice.Construct.DirectProduct.html#1006" class="Generalizable">ℓ₂</a><a id="1197" class="Symbol">)</a>
+<a id="1199" href="Algebra.Lattice.Construct.DirectProduct.html#1103" class="Function">semilattice</a> <a id="1211" href="Algebra.Lattice.Construct.DirectProduct.html#1211" class="Bound">L</a> <a id="1213" href="Algebra.Lattice.Construct.DirectProduct.html#1213" class="Bound">M</a> <a id="1215" class="Symbol">=</a> <a id="1217" class="Keyword">record</a>
+  <a id="1226" class="Symbol">{</a> <a id="1228" href="Algebra.Lattice.Bundles.html#977" class="Field">isSemilattice</a> <a id="1242" class="Symbol">=</a> <a id="1244" class="Keyword">record</a>
+    <a id="1255" class="Symbol">{</a> <a id="1257" href="Algebra.Lattice.Structures.html#1119" class="Field">isBand</a> <a id="1264" class="Symbol">=</a> <a id="1266" href="Algebra.Bundles.html#4521" class="Field">Band.isBand</a> <a id="1278" class="Symbol">(</a><a id="1279" href="Algebra.Construct.DirectProduct.html#5849" class="Function">DirectProduct.band</a> <a id="1298" href="Algebra.Lattice.Bundles.html#1061" class="Function">L.band</a> <a id="1305" href="Algebra.Lattice.Bundles.html#1061" class="Function">M.band</a><a id="1311" class="Symbol">)</a>
+    <a id="1317" class="Symbol">;</a> <a id="1319" href="Algebra.Lattice.Structures.html#1141" class="Field">comm</a>   <a id="1326" class="Symbol">=</a> <a id="1328" class="Symbol">λ</a> <a id="1330" href="Algebra.Lattice.Construct.DirectProduct.html#1330" class="Bound">x</a> <a id="1332" href="Algebra.Lattice.Construct.DirectProduct.html#1332" class="Bound">y</a> <a id="1334" class="Symbol">→</a> <a id="1336" class="Symbol">(</a><a id="1337" href="Algebra.Lattice.Structures.html#1141" class="Function">L.comm</a> <a id="1344" href="Agda.Builtin.Sigma.html#218" class="InductiveConstructor Operator">,</a> <a id="1346" href="Algebra.Lattice.Structures.html#1141" class="Function">M.comm</a><a id="1352" class="Symbol">)</a> <a id="1354" href="Data.Product.html#5154" class="Function Operator">&lt;*&gt;</a> <a id="1358" href="Algebra.Lattice.Construct.DirectProduct.html#1330" class="Bound">x</a> <a id="1360" href="Data.Product.html#5154" class="Function Operator">&lt;*&gt;</a> <a id="1364" href="Algebra.Lattice.Construct.DirectProduct.html#1332" class="Bound">y</a>
+    <a id="1370" class="Symbol">}</a>
+  <a id="1374" class="Symbol">}</a> <a id="1376" class="Keyword">where</a> <a id="1382" class="Keyword">module</a> <a id="1389" href="Algebra.Lattice.Construct.DirectProduct.html#1389" class="Module">L</a> <a id="1391" class="Symbol">=</a> <a id="1393" href="Algebra.Lattice.Bundles.html#801" class="Module">Semilattice</a> <a id="1405" href="Algebra.Lattice.Construct.DirectProduct.html#1211" class="Bound">L</a><a id="1406" class="Symbol">;</a> <a id="1408" class="Keyword">module</a> <a id="1415" href="Algebra.Lattice.Construct.DirectProduct.html#1415" class="Module">M</a> <a id="1417" class="Symbol">=</a> <a id="1419" href="Algebra.Lattice.Bundles.html#801" class="Module">Semilattice</a> <a id="1431" href="Algebra.Lattice.Construct.DirectProduct.html#1213" class="Bound">M</a>
+</pre></body></html>
