@@ -103,6 +103,11 @@ module ScanR (f : A → B → B) (e : B) where
   scanr′ (x ∷ xs) 
     with ys ← scanr′ xs | _ ← scanrNonEmpty′ {xs = xs} with y ∷ _ ← ys = f x y ∷ ys
 
+-- is there a 'better' way to express this? eg
+--  scanr′ (x ∷ xs) with ys@(y ∷ _) ← scanr′ xs = f x y ∷ ys
+--    where instance _ = scanrNonEmpty′ {xs = xs}
+
   scanrNonEmpty′ {xs = []}     = _
   scanrNonEmpty′ {xs = x ∷ xs}
     with ys ← scanr′ xs | _ ← scanrNonEmpty′ {xs = xs} with y ∷ _ ← ys = _
+
