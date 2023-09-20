@@ -23,7 +23,6 @@ private
     B   : Set b
     x   : A
     xs  : List A
-    ys  : List B
 
 
 ------------------------------------------------------------------------
@@ -97,29 +96,13 @@ module ScanR (f : A → B → B) (e : B) where
 -- `f`         : the bare, 'extracted' underlying function
 -- `fNonEmpty` : the witness to the refinement predicate, as an instance
 
--- BUT here, we seem to need to go via `helper`/`helperNonEmpty`...
-
--- simpler instance of the pattern: no mutual recursion
- 
-  helper : A → (ys : List B) → .{{_ : NonEmpty ys}} → List B
-  helper x ys@(y ∷ _) = f x y ∷ ys
-
-  -- why does this instance need `nonEmpty` to be supplied explicitly:
-  -- why doesn't an irrelevant instance suffice?
-  
-  instance helperNonEmpty : ∀ {x} {ys} .{{nonEmpty : NonEmpty ys}} →
-                            NonEmpty (helper x ys {{nonEmpty}}) 
-  helperNonEmpty {ys = y ∷ _} = _
-
--- now we can instantiate the pattern proper
- 
   scanr′ : List A → List B
   instance scanrNonEmpty′ : {xs : List A} → NonEmpty (scanr′ xs)
 
   scanr′ []       = e ∷ []
-  scanr′ (x ∷ xs) = helper x (scanr′ xs) {{scanrNonEmpty′ {xs = xs}}}
-  -- but not (why not?):
-  -- helper x (scanr′ xs) where instance _ = scanrNonEmpty′ {xs = xs}
+  scanr′ (x ∷ xs) 
+    with ys ← scanr′ xs | _ ← scanrNonEmpty′ {xs = xs} with y ∷ _ ← ys = f x y ∷ ys
 
   scanrNonEmpty′ {xs = []}     = _
-  scanrNonEmpty′ {xs = x ∷ xs} = helperNonEmpty {ys = scanr′ xs} {{scanrNonEmpty′ {xs = xs}}}
+  scanrNonEmpty′ {xs = x ∷ xs}
+    with ys ← scanr′ xs | _ ← scanrNonEmpty′ {xs = xs} with y ∷ _ ← ys = _
