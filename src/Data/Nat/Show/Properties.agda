@@ -7,7 +7,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import Data.Digit.Properties using (toDigits-injective; showDigit-injective)
-import Data.List.Properties as Listₚ
+import Data.List.Properties as List
 open import Data.Nat.Base using (ℕ)
 open import Data.Nat.Properties using (_≤?_)
 open import Data.Nat.Show using (charsInBase)
@@ -26,5 +26,5 @@ module _ (base : ℕ) {base≥2 : True (2 ≤? base)} {base≤16 : True (base �
 
   charsInBase-injective : ∀ n m →  charsInBase-base n ≡ charsInBase-base m → n ≡ m
   charsInBase-injective n m = toDigits-injective-base _ _
-                            ∘ Listₚ.reverse-injective
-                            ∘ Listₚ.map-injective (showDigit-injective-base _ _)
+                            ∘ List.reverse-injective
+                            ∘ List.map-injective (showDigit-injective-base _ _)

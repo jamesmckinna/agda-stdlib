@@ -8,15 +8,15 @@
 
 module Reflection.AST.Name where
 
-open import Data.List.Base              using (List)
-import Data.Product.Properties as Prodₚ using (≡-dec)
-import Data.Word.Properties as Wₚ       using (_≟_)
-open import Function.Base               using (_on_)
-open import Relation.Nullary.Decidable.Core            using (map′)
+open import Data.List.Base                using (List)
+import Data.Product.Properties as Product using (≡-dec)
+import Data.Word.Properties as Word       using (_≟_)
+open import Function.Base                 using (_on_)
 open import Relation.Binary.Core                       using (Rel)
 open import Relation.Binary.Definitions                using (Decidable; DecidableEquality)
 open import Relation.Binary.Construct.On               using (decidable)
 open import Relation.Binary.PropositionalEquality.Core using (_≡_; cong)
+open import Relation.Nullary.Decidable.Core            using (map′)
 
 ------------------------------------------------------------------------
 -- Re-export built-ins
@@ -44,7 +44,7 @@ _≈_ : Rel Name _
 _≈_ = _≡_ on toWords
 
 _≈?_ : Decidable _≈_
-_≈?_ = decidable toWords _≡_ (Prodₚ.≡-dec Wₚ._≟_ Wₚ._≟_)
+_≈?_ = decidable toWords _≡_ (Product.≡-dec Word._≟_ Word._≟_)
 
 _≟_ : DecidableEquality Name
 m ≟ n = map′ (toWords-injective _ _) (cong toWords) (m ≈? n)

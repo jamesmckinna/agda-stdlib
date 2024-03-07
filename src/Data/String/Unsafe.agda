@@ -9,7 +9,7 @@
 module Data.String.Unsafe where
 
 import Data.List.Base as List
-import Data.List.Properties as Listₚ
+import Data.List.Properties as List
 open import Data.Maybe.Base using (maybe′)
 open import Data.Nat.Base using (zero; suc; _+_)
 open import Data.Product.Base using (proj₂)
@@ -44,11 +44,11 @@ length-++ : ∀ s t → length (s ++ t) ≡ length s + length t
 length-++ s t = begin
   length (s ++ t)                         ≡⟨⟩
   List.length (toList (s ++ t))           ≡⟨ cong List.length (toList-++ s t) ⟩
-  List.length (toList s List.++ toList t) ≡⟨ Listₚ.length-++ (toList s) ⟩
+  List.length (toList s List.++ toList t) ≡⟨ List.length-++ (toList s) ⟩
   length s + length t                     ∎
 
 length-replicate : ∀ n {c} → length (replicate n c) ≡ n
 length-replicate n {c} = let cs = List.replicate n c in begin
   length (replicate n c) ≡⟨ cong List.length (toList∘fromList cs) ⟩
-  List.length cs         ≡⟨ Listₚ.length-replicate n ⟩
+  List.length cs         ≡⟨ List.length-replicate n ⟩
   n                      ∎

@@ -9,7 +9,7 @@
 module Text.Regex.String.Unsafe where
 
 open import Data.String.Base using (String; toList; fromList)
-import Data.String.Unsafe as Stringₚ
+import Data.String.Unsafe as Unsafe
 open import Function.Base using (_on_; id)
 open import Level using (0ℓ)
 open import Relation.Binary.Core using (Rel)
@@ -61,7 +61,7 @@ search str e = map′ from to (Regex.search input e) where
 
   from : Regex.Match (Regex.Span e _≡_) input exp → Match str e
   from (Regex.mkMatch list match related) =
-    let eq = sym (Stringₚ.toList∘fromList list) in
+    let eq = sym (Unsafe.toList∘fromList list) in
     mkMatch (fromList list)
             (subst (Regex._∈ exp) eq match)
             (subst (λ str → Regex.Span e _≡_ str input) eq related)

@@ -10,6 +10,7 @@ module Data.Vec.Functional.Properties where
 
 open import Data.Empty using (⊥-elim)
 open import Data.Fin.Base
+import Data.Fin.Properties as Fin
 open import Data.Nat as ℕ
 import Data.Nat.Properties as ℕ
 open import Data.Product.Base as Product using (_×_; _,_; proj₁; proj₂)
@@ -26,7 +27,6 @@ open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary.Decidable
   using (Dec; does; yes; no; map′; _×-dec_)
 
-import Data.Fin.Properties as Finₚ
 
 private
   variable
@@ -158,20 +158,20 @@ map-updateAt {f = f} {g = g} f∘g≗h∘f xs i = map-updateAt-local {f = f} {g 
 lookup-++-< : ∀ (xs : Vector A m) (ys : Vector A n) →
               ∀ i (i<m : toℕ i ℕ.< m) →
               (xs ++ ys) i ≡ xs (fromℕ< i<m)
-lookup-++-< {m = m} xs ys i i<m = cong Sum.[ xs , ys ] (Finₚ.splitAt-< m i i<m)
+lookup-++-< {m = m} xs ys i i<m = cong Sum.[ xs , ys ] (Fin.splitAt-< m i i<m)
 
 lookup-++-≥ : ∀ (xs : Vector A m) (ys : Vector A n) →
               ∀ i (i≥m : toℕ i ℕ.≥ m) →
               (xs ++ ys) i ≡ ys (reduce≥ i i≥m)
-lookup-++-≥ {m = m} xs ys i i≥m = cong Sum.[ xs , ys ] (Finₚ.splitAt-≥ m i i≥m)
+lookup-++-≥ {m = m} xs ys i i≥m = cong Sum.[ xs , ys ] (Fin.splitAt-≥ m i i≥m)
 
 lookup-++ˡ : ∀ (xs : Vector A m) (ys : Vector A n) i →
              (xs ++ ys) (i ↑ˡ n) ≡ xs i
-lookup-++ˡ {m = m} {n = n} xs ys i = cong Sum.[ xs , ys ] (Finₚ.splitAt-↑ˡ m i n)
+lookup-++ˡ {m = m} {n = n} xs ys i = cong Sum.[ xs , ys ] (Fin.splitAt-↑ˡ m i n)
 
 lookup-++ʳ : ∀ (xs : Vector A m) (ys : Vector A n) i →
              (xs ++ ys) (m ↑ʳ i) ≡ ys i
-lookup-++ʳ {m = m} {n = n} xs ys i = cong Sum.[ xs , ys ] (Finₚ.splitAt-↑ʳ m n i)
+lookup-++ʳ {m = m} {n = n} xs ys i = cong Sum.[ xs , ys ] (Fin.splitAt-↑ʳ m n i)
 
 module _ {ys ys′ : Vector A m} where
 

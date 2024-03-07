@@ -16,8 +16,8 @@ module Data.Product.Nary.NonDependent where
 
 open import Level as L using (Level; _⊔_; Lift; 0ℓ)
 open import Agda.Builtin.Unit
-open import Data.Product.Base as Prod
-import Data.Product.Properties as Prodₚ
+open import Data.Product.Base as Product
+import Data.Product.Properties as Product
 open import Data.Sum.Base using (_⊎_)
 open import Data.Nat.Base using (ℕ; zero; suc; pred)
 open import Data.Fin.Base using (Fin; zero; suc)
@@ -133,13 +133,13 @@ toEqualₙ : ∀ n {ls} {as : Sets n ls} {l r : Product n as} →
            l ≡ r → Product n (Equalₙ n l r)
 toEqualₙ 0               eq = _
 toEqualₙ 1               eq = eq
-toEqualₙ (suc n@(suc _)) eq = Prod.map₂ (toEqualₙ n) (Prodₚ.,-injective eq)
+toEqualₙ (suc n@(suc _)) eq = Product.map₂ (toEqualₙ n) (Product.,-injective eq)
 
 fromEqualₙ : ∀ n {ls} {as : Sets n ls} {l r : Product n as} →
              Product n (Equalₙ n l r) → l ≡ r
 fromEqualₙ 0               eq = refl
 fromEqualₙ 1               eq = eq
-fromEqualₙ (suc n@(suc _)) eq = uncurry (cong₂ _,_) (Prod.map₂ (fromEqualₙ n) eq)
+fromEqualₙ (suc n@(suc _)) eq = uncurry (cong₂ _,_) (Product.map₂ (fromEqualₙ n) eq)
 
 ------------------------------------------------------------------------
 -- projection of the k-th component

@@ -19,7 +19,7 @@ import Data.List.Relation.Binary.Subset.Setoid as Subset
 import Data.List.Relation.Binary.Sublist.Setoid as Sublist
 import Data.List.Relation.Binary.Equality.Setoid as Equality
 import Data.List.Relation.Binary.Permutation.Setoid as Permutation
-import Data.List.Relation.Binary.Permutation.Setoid.Properties as Permutationₚ
+open import Data.List.Relation.Binary.Permutation.Setoid.Properties using (∈-resp-↭)
 open import Data.Product.Base using (_,_)
 open import Function.Base using (_∘_; _∘₂_)
 open import Level using (Level)
@@ -88,13 +88,13 @@ module _ (S : Setoid a ℓ) where
   open Membership S
 
   ⊆-reflexive-↭  : _↭_ ⇒ _⊆_
-  ⊆-reflexive-↭ xs↭ys = Permutationₚ.∈-resp-↭ S xs↭ys
+  ⊆-reflexive-↭ xs↭ys = ∈-resp-↭ S xs↭ys
 
   ⊆-respʳ-↭ : _⊆_ Respectsʳ _↭_
-  ⊆-respʳ-↭ xs↭ys = Permutationₚ.∈-resp-↭ S xs↭ys ∘_
+  ⊆-respʳ-↭ xs↭ys = ∈-resp-↭ S xs↭ys ∘_
 
   ⊆-respˡ-↭ : _⊆_ Respectsˡ _↭_
-  ⊆-respˡ-↭ xs↭ys = _∘ Permutationₚ.∈-resp-↭ S (↭-sym xs↭ys)
+  ⊆-respˡ-↭ xs↭ys = _∘ ∈-resp-↭ S (↭-sym xs↭ys)
 
   ⊆-↭-isPreorder : IsPreorder _↭_ _⊆_
   ⊆-↭-isPreorder = record

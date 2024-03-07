@@ -14,7 +14,7 @@ open import Data.Bool.Properties using (T-∧)
 open import Data.Empty
 open import Data.Fin.Base using (Fin; zero; suc)
 open import Data.List.Base as List hiding (lookup; updateAt)
-open import Data.List.Properties as Listₚ using (partition-defn)
+open import Data.List.Properties as List using (partition-defn)
 open import Data.List.Membership.Propositional
 open import Data.List.Membership.Propositional.Properties
 import Data.List.Membership.Setoid as SetoidMembership
@@ -24,7 +24,7 @@ open import Data.List.Relation.Unary.All as All using
   ; Null
   )
 open import Data.List.Relation.Unary.Any as Any using (Any; here; there)
-import Data.List.Relation.Binary.Equality.Setoid as ListEq using (_≋_; []; _∷_)
+import Data.List.Relation.Binary.Equality.Setoid as ≋ using (_≋_; []; _∷_)
 open import Data.List.Relation.Binary.Pointwise.Base using (Pointwise; []; _∷_)
 open import Data.List.Relation.Binary.Subset.Propositional using (_⊆_)
 open import Data.Maybe.Base as Maybe using (Maybe; just; nothing)
@@ -523,7 +523,7 @@ takeWhile⁺ {xs = x ∷ xs} Q? (px ∷ pxs) with does (Q? x)
 takeWhile⁻ : (P? : Decidable P) → takeWhile P? xs ≡ xs → All P xs
 takeWhile⁻ {xs = []}     P? eq = []
 takeWhile⁻ {xs = x ∷ xs} P? eq with P? x
-... | yes px = px ∷ takeWhile⁻ P? (Listₚ.∷-injectiveʳ eq)
+... | yes px = px ∷ takeWhile⁻ P? (List.∷-injectiveʳ eq)
 ... | no ¬px = case eq of λ ()
 
 all-takeWhile : (P? : Decidable P) → ∀ xs → All P (takeWhile P? xs)
@@ -743,7 +743,7 @@ all-anti-mono p xs⊆ys = all⁻ p ∘ anti-mono xs⊆ys ∘ all⁺ p _
 module _ (S : Setoid c ℓ) where
 
   open Setoid S
-  open ListEq S
+  open ≋ S
 
   respects : P B.Respects _≈_ → (All P) B.Respects _≋_
   respects p≈ []            []         = []
