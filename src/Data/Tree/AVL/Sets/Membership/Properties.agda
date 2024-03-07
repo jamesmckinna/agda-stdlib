@@ -19,15 +19,15 @@ open import Data.Unit.Base using (tt)
 open import Function.Base using (_∘_; _∘′_; const)
 
 open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl)
-open import Relation.Nullary using (¬_; yes; no; Reflects)
-open import Relation.Nullary.Reflects using (fromEquivalence)
+open import Relation.Nullary using (¬_; yes; no)
+open import Relation.Nullary.Reflects using (Reflects; of; fromEquivalence)
 
 open StrictTotalOrder strictTotalOrder renaming (Carrier to A)
 open import Data.Tree.AVL.Sets strictTotalOrder
 open import Data.Tree.AVL.Sets.Membership strictTotalOrder
 open import Data.Tree.AVL.Map.Membership.Propositional strictTotalOrder using (_∈ₖᵥ_)
 import Data.Tree.AVL.Map.Membership.Propositional.Properties strictTotalOrder as Map
-open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder as Mapₚ
+open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder as Any
 
 private
   variable
@@ -35,10 +35,10 @@ private
     s : ⟨Set⟩
 
 ∈toMap : x ∈ s → (x , tt) ∈ₖᵥ s
-∈toMap = Mapₚ.map (_, refl)
+∈toMap = Any.map (_, refl)
 
 ∈fromMap : (x , tt) ∈ₖᵥ s → x ∈ s
-∈fromMap = Mapₚ.map proj₁
+∈fromMap = Any.map proj₁
 
 ------------------------------------------------------------------------
 -- empty
@@ -86,5 +86,5 @@ member-∉ p = Map.member-∉ₖᵥ p tt ∘ ∈toMap
 
 member-Reflects-∈ : Reflects (x ∈ s) (member x s)
 member-Reflects-∈ {x = x} {s = s} with member x s in eq
-... | true = Reflects.ofʸ (member-∈ eq)
-... | false = Reflects.ofⁿ (member-∉ eq)
+... | true = of (member-∈ eq)
+... | false = of (member-∉ eq)

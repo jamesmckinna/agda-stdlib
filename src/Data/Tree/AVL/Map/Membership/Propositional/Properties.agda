@@ -37,7 +37,7 @@ import Data.Tree.AVL.Indexed.Relation.Unary.Any strictTotalOrder as IAny
 import Data.Tree.AVL.Indexed.Relation.Unary.Any.Properties strictTotalOrder as IAnyₚ
 open import Data.Tree.AVL.Key strictTotalOrder using (⊥⁺<[_]<⊤⁺)
 open import Data.Tree.AVL.Map strictTotalOrder
-open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder as Map using (Any)
+open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder using (Any)
 open import Data.Tree.AVL.Map.Membership.Propositional strictTotalOrder
 open import Data.Tree.AVL.Relation.Unary.Any strictTotalOrder as Any using (tree)
 
