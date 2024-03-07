@@ -57,10 +57,9 @@ setoid A = record
   trans []        []         = []
   trans (x ∷ xs≈) (.x ∷ ys≈) = x ∷ ♯ trans (♭ xs≈) (♭ ys≈)
 
-module ≈-Reasoning where
-  import Relation.Binary.Reasoning.Setoid as EqR
-  private
-    open module R {a} {A : Set a} = EqR (setoid A) public
+module ≈-Reasoning {A : Set a} where
+
+  open import Relation.Binary.Reasoning.Setoid (setoid A) public
 
 -- map preserves equality.
 
