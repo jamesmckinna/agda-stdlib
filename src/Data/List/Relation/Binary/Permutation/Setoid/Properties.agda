@@ -37,7 +37,7 @@ open import Data.Product.Base using (_,_; _×_; ∃; ∃₂; proj₁; proj₂)
 open import Function.Base using (_∘_; _⟨_⟩_; flip)
 open import Level using (Level; _⊔_)
 open import Relation.Unary using (Pred; Decidable)
-import Relation.Binary.Reasoning.Setoid as RelSetoid
+import Relation.Binary.Reasoning.Setoid as ≈-Reasoning
 open import Relation.Binary.Properties.Setoid S using (≉-resp₂)
 open import Relation.Binary.PropositionalEquality.Core as ≡
   using (_≡_ ; refl; sym; cong; cong₂; subst; _≢_)
@@ -484,7 +484,7 @@ module _ {_∙_ : Op₂ A} {ε : A} (isCmonoid : IsCommutativeMonoid _≈_ _∙_
   open module CM = IsCommutativeMonoid isCmonoid
 
   private
-    module S = RelSetoid setoid
+    module S = ≈-Reasoning setoid
 
     cmonoid : CommutativeMonoid _ _
     cmonoid = record { isCommutativeMonoid = isCmonoid }
