@@ -12,18 +12,13 @@ module Data.Tree.AVL.Sets.Membership
   {a ℓ₁ ℓ₂} (strictTotalOrder : StrictTotalOrder a ℓ₁ ℓ₂)
   where
 
-open import Data.Bool.Base using (true; false)
-open import Data.Product.Base as Product using (_,_; proj₁; proj₂)
-open import Data.Sum.Base as Sum using (_⊎_)
-open import Data.Unit.Base using (tt)
-open import Function.Base using (_∘_; _∘′_; const)
-
-open import Relation.Nullary using (¬_; yes; no; Reflects)
-open import Relation.Nullary.Reflects using (fromEquivalence)
+open import Data.Product.Base as Product using (proj₁)
+open import Function.Base using (_∘_)
+open import Relation.Nullary.Negation.Core using (¬_)
 
 open StrictTotalOrder strictTotalOrder renaming (Carrier to A)
 open import Data.Tree.AVL.Sets strictTotalOrder
-open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder as Mapₚ
+open import Data.Tree.AVL.Map.Relation.Unary.Any strictTotalOrder using (Any)
 
 ------------------------------------------------------------------------
 -- ∈
