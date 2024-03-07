@@ -15,7 +15,7 @@ open import Relation.Binary.Definitions using (Decidable)
 open import Relation.Nullary.Decidable using (does; yes; no)
 open import Relation.Nullary.Negation
   using (contradiction; contradiction₂)
-import Relation.Binary.Reasoning.Setoid as SetoidReasoning
+import Relation.Binary.Reasoning.Setoid as ≈-Reasoning
 
 import Algebra.Construct.LexProduct.Base as Base
 
@@ -64,7 +64,7 @@ module NaturalOrder where
   -- `Relation.Binary.Construct.NaturalOrder.Left/Right` to prove these
   -- properties but the equalities are defined the wrong way around
 
-  open SetoidReasoning M.setoid
+  open ≈-Reasoning M.setoid
 
   ≤∙ˡ-resp-≈ : a ∙ b ≈₁ b → a ≈₁ c → b ≈₁ d → c ∙ d ≈₁ d
   ≤∙ˡ-resp-≈ {a} {b} {c} {d} ab≈b a≈c b≈d = begin
@@ -118,7 +118,7 @@ module NaturalOrder where
 ------------------------------------------------------------------------
 -- Basic properties
 
-open SetoidReasoning N.setoid
+open ≈-Reasoning N.setoid
 open NaturalOrder
 
 case₁ : a ∙ b ≈₁ a → a ∙ b ≉₁ b → lex a b x y ≈₂ x
