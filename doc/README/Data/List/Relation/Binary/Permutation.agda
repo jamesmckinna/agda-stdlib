@@ -52,11 +52,17 @@ lem₂ = begin
   1 ∷ 3 ∷ 2 ∷ []  ↭⟨ swap 1 3 refl ⟩
   3 ∷ 1 ∷ 2 ∷ []  ∎
 
+-- In practice it is further useful to extend `PermutationReasoning`
+-- with specialised syntax `_<⟨_⟩_` and `_<<⟨_⟩_` to support
+-- the distinguished use of the `prep ` and `swap` steps,
+-- allowing the above proof to be recast in the following form:
+
 lem₂ᵣ : 1 ∷ 2 ∷ 3 ∷ [] ↭ 3 ∷ 1 ∷ 2 ∷ []
 lem₂ᵣ = begin
-  1 ∷ (2 ∷ (3 ∷ [])) <⟨ swap 2 3 refl ⟩
-  1 ∷ 3 ∷ (2 ∷ [])   <<⟨ refl ⟩
-  3 ∷ 1 ∷ (2 ∷ [])   ∎
+  1 ∷ (2 ∷ 3 ∷ []) <⟨ swap 2 3 refl ⟩
+  1 ∷ 3 ∷ 2 ∷ []   <<⟨ refl ⟩
+  3 ∷ 1 ∷ 2 ∷ []   ∎
+
 
 -- As might be expected, properties of the permutation relation may be
 -- found in:
@@ -74,3 +80,4 @@ lem₄ = ++-isCommutativeMonoid
 -- found in:
 
 import Data.List.Relation.Binary.Permutation.Setoid
+

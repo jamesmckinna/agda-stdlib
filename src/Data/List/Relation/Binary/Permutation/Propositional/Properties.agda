@@ -216,11 +216,11 @@ drop-mid {A = A} {x} ws xs p = drop-mid′ p ws xs refl refl
       _ ∷ (xs ++ _ ∷ _) <⟨ shift _ _ _ ⟩
       _ ∷ _ ∷ xs ++ _   <<⟨ refl ⟩
       _ ∷ _ ∷ xs ++ _   ∎
-  drop-mid′ (swap y z p) (y ∷ z ∷ ws) (z ∷ [])     refl refl = {!begin
-      y ∷ z ∷ ws ++ ys  ↭⟨ ? ⟩
-      _ ∷ _ ∷ ws ++ _ <⟨ ↭-sym (shift _ _ _) ⟩
-      _ ∷ ws ++ _ ∷ _ <⟨ p ⟩
-      z ∷ _             ∎!}
+  drop-mid′ (swap y z p) (y ∷ z ∷ ws) (z ∷ [])     refl refl = begin
+      (_ ∷ _ ∷ ws ++ _) <<⟨ refl ⟩
+      _ ∷ (_ ∷ ws ++ _) <⟨ ↭-sym (shift _ _ _) ⟩
+      _ ∷ (ws ++ _ ∷ _) <⟨ p ⟩
+      _ ∷ _             ∎
   drop-mid′ (swap y z p) (y ∷ z ∷ ws) (z ∷ y ∷ xs) refl refl = swap y z (drop-mid′ p _ _ refl refl)
   drop-mid′ (trans p₁ p₂) ws  xs refl refl with ∈-∃++ (∈-resp-↭ p₁ (∈-insert ws))
   ... | (h , t , refl) = trans (drop-mid′ p₁ ws h refl refl) (drop-mid′ p₂ h xs refl refl)
