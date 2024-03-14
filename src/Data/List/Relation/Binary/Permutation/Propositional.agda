@@ -10,6 +10,7 @@ module Data.List.Relation.Binary.Permutation.Propositional
   {a} {A : Set a} where
 
 open import Data.List.Base using (List; []; _∷_)
+open import Function.Base using (case_of_)
 open import Relation.Binary.Core using (Rel; _⇒_)
 open import Relation.Binary.Bundles using (Setoid)
 open import Relation.Binary.Structures using (IsEquivalence)
@@ -89,12 +90,23 @@ module PermutationReasoning where
   -- Skip reasoning on the first element
   step-prep : ∀ x xs {ys zs : List A} → (x ∷ ys) IsRelatedTo zs →
               xs ↭ ys → (x ∷ xs) IsRelatedTo zs
-  step-prep x xs rel xs↭ys = relTo (trans (prep x xs↭ys) (begin rel))
-
-  -- Skip reasoning about the first two elements
-  step-swap : ∀ x y xs {ys zs : List A} → (y ∷ x ∷ ys) IsRelatedTo zs →
-              xs ↭ ys → (x ∷ y ∷ xs) IsRelatedTo zs
-  step-swap x y xs rel xs↭ys = relTo (trans (swap x y xs↭ys) (begin rel))
+  step-prep x xs rel xs↭ys = ↭-go (prep x xs↭ys) rel
 
   syntax step-prep x xs y↭z x↭y = x ∷ xs <⟨ x↭y ⟩ y↭z
-  syntax step-swap x y xs y↭z x↭y = x ∷ y ∷ xs <<⟨ x↭y ⟩ y↭z
+
+  -- Skip reasoning about the first two elements
+  step-swap′ : ∀ {x y} {xs ys zs : List A} ws → ws ≡ x ∷ y ∷ xs →
+              (y ∷ x ∷ ys) IsRelatedTo zs →
+              xs ↭ ys → ws IsRelatedTo zs
+  step-swap′ {x} {y} ws refl rel xs↭ys = ↭-go (swap x y xs↭ys) rel
+
+  Step-Swap : ∀ {ys zs} (ws  : List A) → Set a
+  Step-Swap {ys} {zs} ws@(x ∷ y ∷ xs) = (y ∷ x ∷ ys) IsRelatedTo zs → xs ↭ ys → ws IsRelatedTo zs
+  Step-Swap {ys} {zs} ws@_            = ∀ {xs} → ws IsRelatedTo zs → xs ↭ ys → ws IsRelatedTo zs
+
+  step-swap : ∀ {ys zs} (ws  : List A) → Step-Swap {ys} {zs} ws
+  step-swap ws@(x ∷ y ∷ xs) rel xs↭ys = step-swap′ ws refl rel xs↭ys
+  step-swap ws@(x ∷ [])     rel _     = rel
+  step-swap ws@[]           rel _     = rel
+
+  syntax step-swap xs ys↭zs xs↭ys = xs <<⟨ xs↭ys ⟩ ys↭zs

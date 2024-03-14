@@ -52,6 +52,12 @@ lem₂ = begin
   1 ∷ 3 ∷ 2 ∷ []  ↭⟨ swap 1 3 refl ⟩
   3 ∷ 1 ∷ 2 ∷ []  ∎
 
+lem₂ᵣ : 1 ∷ 2 ∷ 3 ∷ [] ↭ 3 ∷ 1 ∷ 2 ∷ []
+lem₂ᵣ = begin
+  1 ∷ (2 ∷ (3 ∷ [])) <⟨ swap 2 3 refl ⟩
+  1 ∷ 3 ∷ (2 ∷ [])   <<⟨ refl ⟩
+  3 ∷ 1 ∷ (2 ∷ [])   ∎
+
 -- As might be expected, properties of the permutation relation may be
 -- found in:
 
