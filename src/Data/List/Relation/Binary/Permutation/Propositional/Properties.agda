@@ -53,7 +53,7 @@ module _ {A : Set a} where
     hiding (shift; dropMiddleElement-≋; foldr-commMonoid)
 
   shift : ∀ v (xs ys : List A) → xs ++ [ v ] ++ ys ↭ v ∷ xs ++ ys
-  shift = {!↭ₚ.↭-shift !}
+  shift = {!↭ₚ.↭-shift !} -- here!
 
 {-
 ------------------------------------------------------------------------
