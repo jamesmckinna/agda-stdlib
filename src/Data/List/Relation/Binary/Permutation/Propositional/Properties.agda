@@ -44,14 +44,17 @@ private
 
 module _ {A : Set a} where
 
+  open module ↭ = Propositional {A = A}
   private module ↭ₚ = Properties (setoid A)
+  -- sharing fails between the two modules!
 
-  open Propositional {A = A}
   open ↭ₚ public
-    hiding (shift)
+    renaming (dropMiddleElement to drop-mid)
+    hiding (shift; dropMiddleElement-≋; foldr-commMonoid)
 
   shift : ∀ v (xs ys : List A) → xs ++ [ v ] ++ ys ↭ v ∷ xs ++ ys
   shift = {!↭ₚ.↭-shift !}
+
 {-
 ------------------------------------------------------------------------
 -- Permutations of empty and singleton lists
@@ -79,24 +82,6 @@ module _ {A : Set a} where
 
 ------------------------------------------------------------------------
 -- Relationships to other predicates
-
-All-resp-↭ : ∀ {P : Pred A p} → (All P) Respects _↭_
-All-resp-↭ [] wit                     = wit
-All-resp-↭ (prep x p) (px ∷ wit)        = px ∷ All-resp-↭ p wit
-All-resp-↭ (swap x y p) (px ∷ py ∷ wit) = py ∷ px ∷ All-resp-↭ p wit
-All-resp-↭ (trans p₁ p₂) wit            = All-resp-↭ p₂ (All-resp-↭ p₁ wit)
-
-Any-resp-↭ : ∀ {P : Pred A p} → (Any P) Respects _↭_
-Any-resp-↭ []         wit                 = wit
-Any-resp-↭ (prep x p)   (here px)           = here px
-Any-resp-↭ (prep x p)   (there wit)         = there (Any-resp-↭ p wit)
-Any-resp-↭ (swap x y p) (here px)           = there (here px)
-Any-resp-↭ (swap x y p) (there (here px))   = here px
-Any-resp-↭ (swap x y p) (there (there wit)) = there (there (Any-resp-↭ p wit))
-Any-resp-↭ (trans p p₁) wit                 = Any-resp-↭ p₁ (Any-resp-↭ p wit)
-
-∈-resp-↭ : ∀ {x : A} → (x ∈_) Respects _↭_
-∈-resp-↭ = Any-resp-↭
 
 Any-resp-[σ⁻¹∘σ] : {xs ys : List A} {P : Pred A p} →
                    (σ : xs ↭ ys) →
@@ -127,12 +112,6 @@ Any-resp-[σ⁻¹∘σ] (swap _ _ σ)  (there (there ix))
 
 module _ (f : A → B) where
 
-  map⁺ : ∀ {xs ys} → xs ↭ ys → map f xs ↭ map f ys
-  map⁺ []          = ↭-refl
-  map⁺ (prep x p)    = prep _ (map⁺ p)
-  map⁺ (swap x y p)  = ↭-swap _ _ (map⁺ p)
-  map⁺ (trans p₁ p₂) = ↭-trans (map⁺ p₁) (map⁺ p₂)
-
   -- permutations preserve 'being a mapped list'
   ↭-map-inv : ∀ {xs ys} → map f xs ↭ ys → ∃ λ ys′ → ys ≡ map f ys′ × xs ↭ ys′
   ↭-map-inv {[]}     ρ                                                  = -, ↭-empty-inv (↭-sym ρ) , ↭-refl
@@ -142,6 +121,7 @@ module _ (f : A → B) where
   ↭-map-inv {_ ∷ _ ∷ _} (trans ρ₁ ρ₂) with _ , refl , ρ₃ ← ↭-map-inv ρ₁
                                       with _ , refl , ρ₄ ← ↭-map-inv ρ₂ = -, refl , ↭-trans ρ₃ ρ₄
 
+-}
 {-
 ------------------------------------------------------------------------
 -- length
@@ -364,5 +344,4 @@ module _ {ℓ} {R : Rel A ℓ} (R? : Decidable R) where
     (x ∷ xs) ++ y ∷ ys       ≡⟨ List.++-assoc [ x ] xs (y ∷ ys) ⟨
     x ∷ xs ++ y ∷ ys         ∎
     where open PermutationReasoning
--}
 -}
