@@ -56,6 +56,3 @@ infix 4 _<_
 _<_ : Rel Char zero
 _<_ = ℕ._<_ on toℕ
 
-infix 4 _≤_
-_≤_ : Rel Char zero
-_≤_ = ReflClosure _<_

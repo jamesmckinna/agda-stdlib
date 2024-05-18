@@ -15,18 +15,19 @@ import Data.Nat.Properties as ℕ
 open import Data.Product.Base using (_,_)
 
 open import Function.Base
-open import Relation.Nullary using (¬_; yes; no)
-open import Relation.Nullary.Decidable using (map′; isYes)
+open import Level using (zero)
+open import Relation.Nullary.Negation.Core using (¬_; contradiction)
+open import Relation.Nullary.Decidable.Core using (yes; no; map′; isYes)
 open import Relation.Binary.Core using (_⇒_)
 open import Relation.Binary.Bundles
-  using (Setoid; DecSetoid; StrictPartialOrder; StrictTotalOrder; Preorder; Poset; DecPoset)
+  using (Setoid; DecSetoid; StrictPartialOrder; StrictTotalOrder; Preorder; Poset; DecPoset; DecTotalOrder)
 open import Relation.Binary.Structures
-  using (IsDecEquivalence; IsStrictPartialOrder; IsStrictTotalOrder; IsPreorder; IsPartialOrder; IsDecPartialOrder; IsEquivalence)
+  using (IsDecEquivalence; IsStrictPartialOrder; IsStrictTotalOrder; IsTotalOrder; IsPreorder; IsPartialOrder; IsDecPartialOrder; IsDecStrictPartialOrder; IsDecTotalOrder; IsEquivalence)
 open import Relation.Binary.Definitions
   using (Decidable; DecidableEquality; Trichotomous; Irreflexive; Transitive; Asymmetric; Antisymmetric; Symmetric; Substitutive; Reflexive; tri<; tri≈; tri>)
+open import Relation.Binary.Core using (Rel)
 import Relation.Binary.Construct.On as On
-import Relation.Binary.Construct.Subst.Equality as Subst
-import Relation.Binary.Construct.Closure.Reflexive as Refl
+open import Relation.Binary.Construct.Closure.Reflexive using (ReflClosure)
 import Relation.Binary.Construct.Closure.Reflexive.Properties as Refl
 open import Relation.Binary.PropositionalEquality.Core as ≡
   using (_≡_; _≢_; refl; cong; sym; trans; subst)
@@ -58,14 +59,11 @@ infix 4 _≟_
 _≟_ : DecidableEquality Char
 x ≟ y = map′ ≈⇒≡ ≈-reflexive (toℕ x ℕ.≟ toℕ y)
 
-setoid : Setoid _ _
-setoid = ≡.setoid Char
-
 decSetoid : DecSetoid _ _
 decSetoid = ≡.decSetoid _≟_
 
-isDecEquivalence : IsDecEquivalence _≡_
-isDecEquivalence = ≡.isDecEquivalence _≟_
+open DecSetoid decSetoid public
+  using (isDecEquivalence; setoid; isEquivalence)
 
 ------------------------------------------------------------------------
 -- Boolean equality test.
@@ -92,31 +90,31 @@ private
 
 ------------------------------------------------------------------------
 -- Properties of _<_
-
+{-
 infix 4 _<?_
 _<?_ : Decidable _<_
 _<?_ = On.decidable toℕ ℕ._<_ ℕ._<?_
-
+-}
 <-cmp : Trichotomous _≡_ _<_
 <-cmp c d with ℕ.<-cmp (toℕ c) (toℕ d)
 ... | tri< lt ¬eq ¬gt = tri< lt (≉⇒≢ ¬eq) ¬gt
 ... | tri≈ ¬lt eq ¬gt = tri≈ ¬lt (≈⇒≡ eq) ¬gt
 ... | tri> ¬lt ¬eq gt = tri> ¬lt (≉⇒≢ ¬eq) gt
-
+{-
 <-irrefl : Irreflexive _≡_ _<_
-<-irrefl = ℕ.<-irrefl ∘′ cong toℕ
+<-irrefl = ℕ.<-irrefl ∘′ ≈-reflexive
 
 <-trans : Transitive _<_
 <-trans {c} {d} {e} = On.transitive toℕ ℕ._<_ ℕ.<-trans {c} {d} {e}
 
 <-asym : Asymmetric _<_
 <-asym {c} {d} = On.asymmetric toℕ ℕ._<_ ℕ.<-asym {c} {d}
-
+-}
 <-isStrictPartialOrder : IsStrictPartialOrder _≡_ _<_
 <-isStrictPartialOrder = record
-  { isEquivalence = ≡.isEquivalence
-  ; irrefl        = <-irrefl
-  ; trans         = λ {a} {b} {c} → <-trans {a} {b} {c}
+  { isEquivalence = isEquivalence
+  ; irrefl        = ℕ.<-irrefl ∘′ ≈-reflexive
+  ; trans         = λ {c} {d} {e} → On.transitive toℕ ℕ._<_ ℕ.<-trans {c} {d} {e}
   ; <-resp-≈      = (λ {c} → ≡.subst (c <_))
                   , (λ {c} → ≡.subst (_< c))
   }
@@ -127,60 +125,59 @@ _<?_ = On.decidable toℕ ℕ._<_ ℕ._<?_
   ; compare              = <-cmp
   }
 
+open IsStrictTotalOrder <-isStrictTotalOrder public
+  using (_<?_)
+  renaming (isDecStrictPartialOrder to <-isDecStrictPartialOrder
+           ; asym to <-asym
+           ; irrefl to <-irrefl
+           ; trans to <-trans
+           )
+{-
 <-strictPartialOrder : StrictPartialOrder _ _ _
 <-strictPartialOrder = record
   { isStrictPartialOrder = <-isStrictPartialOrder
   }
-
+-}
 <-strictTotalOrder : StrictTotalOrder _ _ _
 <-strictTotalOrder = record
   { isStrictTotalOrder = <-isStrictTotalOrder
   }
 
+open StrictTotalOrder <-strictTotalOrder public
+  using ()
+  renaming (strictPartialOrder to <-strictPartialOrder)
+
 ------------------------------------------------------------------------
 -- Properties of _≤_
 
-infix 4 _≤?_
-_≤?_ : Decidable _≤_
-_≤?_ = Refl.decidable <-cmp
+infix 4 _≤_
+_≤_ : Rel Char zero
+_≤_ = ReflClosure _<_
 
-≤-reflexive : _≡_ ⇒ _≤_
-≤-reflexive = Refl.reflexive
+≤-isDecTotalOrder : IsDecTotalOrder _≡_ _≤_
+≤-isDecTotalOrder = isDecTotalOrder <-isStrictTotalOrder
+  where open Refl.Structures {_~_ = _<_}
 
-≤-trans : Transitive _≤_
-≤-trans = Refl.trans (λ {a} {b} {c} → <-trans {a} {b} {c})
+open IsDecTotalOrder ≤-isDecTotalOrder public
+  using (_≤?_)
+  renaming ( isTotalOrder to ≤-isTotalOrder
+           ; isDecPartialOrder to ≤-isDecPartialOrder
+           ; isPartialOrder to ≤-isPartialOrder
+           ; isPreorder to ≤-isPreorder
+           ; reflexive to ≤-reflexive
+           ; trans to ≤-trans
+           ; antisym to ≤-antisym
+           )
 
-≤-antisym : Antisymmetric _≡_ _≤_
-≤-antisym = Refl.antisym _≡_ refl ℕ.<-asym
+≤-decTotalOrder : DecTotalOrder _ _ _
+≤-decTotalOrder = record { isDecTotalOrder = ≤-isDecTotalOrder }
 
-≤-isPreorder : IsPreorder _≡_ _≤_
-≤-isPreorder = record
-  { isEquivalence = ≡.isEquivalence
-  ; reflexive     = ≤-reflexive
-  ; trans         = ≤-trans
-  }
-
-≤-isPartialOrder : IsPartialOrder _≡_ _≤_
-≤-isPartialOrder = record
-  { isPreorder = ≤-isPreorder
-  ; antisym    = ≤-antisym
-  }
-
-≤-isDecPartialOrder : IsDecPartialOrder _≡_ _≤_
-≤-isDecPartialOrder = record
-  { isPartialOrder = ≤-isPartialOrder
-  ; _≟_            = _≟_
-  ; _≤?_           = _≤?_
-  }
-
-≤-preorder : Preorder _ _ _
-≤-preorder = record { isPreorder = ≤-isPreorder }
-
-≤-poset : Poset _ _ _
-≤-poset = record { isPartialOrder = ≤-isPartialOrder }
-
-≤-decPoset : DecPoset _ _ _
-≤-decPoset = record { isDecPartialOrder = ≤-isDecPartialOrder }
+open DecTotalOrder ≤-decTotalOrder public
+  using ()
+  renaming ( decPoset to ≤-decPoset
+           ; poset to ≤-poset
+           ; preorder to ≤-preorder
+           )
 
 ------------------------------------------------------------------------
 -- DEPRECATED NAMES

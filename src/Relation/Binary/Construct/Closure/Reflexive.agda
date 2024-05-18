@@ -8,8 +8,8 @@
 
 module Relation.Binary.Construct.Closure.Reflexive where
 
-open import Data.Unit.Base
-open import Level
+open import Data.Unit.Base using (tt)
+open import Level using (Level; _⊔_)
 open import Function.Base using (_∋_)
 open import Relation.Binary.Core using (Rel; _=[_]⇒_; _⇒_)
 open import Relation.Binary.Definitions using (Reflexive)
@@ -20,13 +20,15 @@ private
   variable
     a ℓ ℓ₁ ℓ₂ : Level
     A B : Set a
+    R : Rel A ℓ
+    x y : A
 
 ------------------------------------------------------------------------
 -- Definition
 
 data ReflClosure {A : Set a} (_∼_ : Rel A ℓ) : Rel A (a ⊔ ℓ) where
   refl : Reflexive (ReflClosure _∼_)
-  [_]  : ∀ {x y} (x∼y : x ∼ y) → ReflClosure _∼_ x y
+  [_]  : _∼_ ⇒ ReflClosure _∼_
 
 ------------------------------------------------------------------------
 -- Operations
@@ -40,15 +42,14 @@ map R⇒S refl    = refl
 -- Properties
 
 -- The reflexive closure has no effect on reflexive relations.
-drop-refl : {R : Rel A ℓ} → Reflexive R → ReflClosure R ⇒ R
+drop-refl : Reflexive R → ReflClosure R ⇒ R
 drop-refl rfl [ xRy ] = xRy
 drop-refl rfl refl    = rfl
 
-reflexive : {R : Rel A ℓ} → _≡_ ⇒ ReflClosure R
+reflexive : _≡_ ⇒ ReflClosure R
 reflexive refl = refl
 
-[]-injective : {R : Rel A ℓ} → ∀ {x y p q} →
-               (ReflClosure R x y ∋ [ p ]) ≡ [ q ] → p ≡ q
+[]-injective : ∀ {p q} → (ReflClosure R x y ∋ [ p ]) ≡ [ q ] → p ≡ q
 []-injective refl = refl
 
 ------------------------------------------------------------------------
