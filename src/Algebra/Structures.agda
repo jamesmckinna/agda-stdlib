@@ -450,6 +450,94 @@ record IsCommutativeSemiringWithoutOne
 -- Structures with 2 binary operations & 2 elements
 ------------------------------------------------------------------------
 
+record IsQuasiringWithoutAnnihilatingZero (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+  field
+    +-isMonoid    : IsMonoid + 0#
+    *-cong        : Congruent₂ *
+    *-assoc       : Associative *
+    *-identity    : Identity 1# *
+    distrib       : * DistributesOver +
+
+  open IsMonoid +-isMonoid public
+    renaming
+    ( assoc         to +-assoc
+    ; ∙-cong        to +-cong
+    ; ∙-congˡ       to +-congˡ
+    ; ∙-congʳ       to +-congʳ
+    ; identity      to +-identity
+    ; identityˡ     to +-identityˡ
+    ; identityʳ     to +-identityʳ
+    ; isMagma       to +-isMagma
+    ; isUnitalMagma to +-isUnitalMagma
+    ; isSemigroup   to +-isSemigroup
+    )
+
+  distribˡ : * DistributesOverˡ +
+  distribˡ = proj₁ distrib
+
+  distribʳ : * DistributesOverʳ +
+  distribʳ = proj₂ distrib
+
+  identityˡ : LeftIdentity 1# *
+  identityˡ = proj₁ *-identity
+
+  identityʳ : RightIdentity 1# *
+  identityʳ = proj₂ *-identity
+
+  *-isMagma : IsMagma *
+  *-isMagma = record
+    { isEquivalence = isEquivalence
+    ; ∙-cong        = *-cong
+    }
+
+  *-isSemigroup : IsSemigroup *
+  *-isSemigroup = record
+    { isMagma = *-isMagma
+    ; assoc   = *-assoc
+    }
+
+  *-isMonoid : IsMonoid * 1#
+  *-isMonoid = record
+    { isSemigroup = *-isSemigroup
+    ; identity    = *-identity
+    }
+
+  open IsMonoid *-isMonoid public
+    using ()
+    renaming
+    ( ∙-congˡ     to *-congˡ
+    ; ∙-congʳ     to *-congʳ
+    ; identityˡ   to *-identityˡ
+    ; identityʳ   to *-identityʳ
+    )
+
+record IsQuasiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
+  field
+    +-isMonoid    : IsMonoid + 0#
+    *-cong        : Congruent₂ *
+    *-assoc       : Associative *
+    *-identity    : Identity 1# *
+    distrib       : * DistributesOver +
+    zero          : Zero 0# *
+
+  isQuasiringWithoutAnnihilatingZero : IsQuasiringWithoutAnnihilatingZero + * 0# 1#
+  isQuasiringWithoutAnnihilatingZero = record
+    { +-isMonoid = +-isMonoid
+    ; *-cong     = *-cong
+    ; *-assoc    = *-assoc
+    ; *-identity = *-identity
+    ; distrib    = distrib
+    }
+
+  open IsQuasiringWithoutAnnihilatingZero isQuasiringWithoutAnnihilatingZero public
+    hiding (+-isMonoid; *-cong; *-assoc; *-identity; distrib)
+
+  zeroˡ : LeftZero 0# *
+  zeroˡ = proj₁ zero
+
+  zeroʳ : RightZero 0# *
+  zeroʳ = proj₂ zero
+
 record IsSemiringWithoutAnnihilatingZero (+ * : Op₂ A)
                                          (0# 1# : A) : Set (a ⊔ ℓ) where
   field
@@ -604,83 +692,14 @@ record IsKleeneAlgebra (+ * : Op₂ A) (⋆ : Op₁ A) (0# 1# : A) : Set (a ⊔ 
   starDestructiveʳ : StarRightDestructive + * ⋆
   starDestructiveʳ = proj₂ starDestructive
 
-record IsQuasiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
-  field
-    +-isMonoid    : IsMonoid + 0#
-    *-cong        : Congruent₂ *
-    *-assoc       : Associative *
-    *-identity    : Identity 1# *
-    distrib       : * DistributesOver +
-    zero          : Zero 0# *
-
-  open IsMonoid +-isMonoid public
-    renaming
-    ( assoc         to +-assoc
-    ; ∙-cong        to +-cong
-    ; ∙-congˡ       to +-congˡ
-    ; ∙-congʳ       to +-congʳ
-    ; identity      to +-identity
-    ; identityˡ     to +-identityˡ
-    ; identityʳ     to +-identityʳ
-    ; isMagma       to +-isMagma
-    ; isUnitalMagma to +-isUnitalMagma
-    ; isSemigroup   to +-isSemigroup
-    )
-
-  distribˡ : * DistributesOverˡ +
-  distribˡ = proj₁ distrib
-
-  distribʳ : * DistributesOverʳ +
-  distribʳ = proj₂ distrib
-
-  zeroˡ : LeftZero 0# *
-  zeroˡ = proj₁ zero
-
-  zeroʳ : RightZero 0# *
-  zeroʳ = proj₂ zero
-
-  identityˡ : LeftIdentity 1# *
-  identityˡ = proj₁ *-identity
-
-  identityʳ : RightIdentity 1# *
-  identityʳ = proj₂ *-identity
-
-  *-isMagma : IsMagma *
-  *-isMagma = record
-    { isEquivalence = isEquivalence
-    ; ∙-cong        = *-cong
-    }
-
-  *-isSemigroup : IsSemigroup *
-  *-isSemigroup = record
-    { isMagma = *-isMagma
-    ; assoc   = *-assoc
-    }
-
-  *-isMonoid : IsMonoid * 1#
-  *-isMonoid = record
-    { isSemigroup = *-isSemigroup
-    ; identity    = *-identity
-    }
-
-  open IsMonoid *-isMonoid public
-    using ()
-    renaming
-    ( ∙-congˡ     to *-congˡ
-    ; ∙-congʳ     to *-congʳ
-    ; identityˡ   to *-identityˡ
-    ; identityʳ   to *-identityʳ
-    )
-
 ------------------------------------------------------------------------
 -- Structures with 2 binary operations, 1 unary operation & 1 element
 ------------------------------------------------------------------------
 
-record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ) where
+record IsNonAssociativeRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ) where
   field
     +-isAbelianGroup : IsAbelianGroup + 0# -_
     *-cong           : Congruent₂ *
-    *-assoc          : Associative *
     distrib          : * DistributesOver +
 
   open IsAbelianGroup +-isAbelianGroup public
@@ -732,6 +751,23 @@ record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ
     ; ∙-cong        = *-cong
     }
 
+record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ) where
+  field
+    +-isAbelianGroup : IsAbelianGroup + 0# -_
+    *-cong           : Congruent₂ *
+    *-assoc          : Associative *
+    distrib          : * DistributesOver +
+
+  isNonAssociativeRingWithoutOne : IsNonAssociativeRingWithoutOne + * -_ 0#
+  isNonAssociativeRingWithoutOne = record
+    { +-isAbelianGroup = +-isAbelianGroup
+    ; *-cong           = *-cong
+    ; distrib          = distrib
+    }
+
+  open IsNonAssociativeRingWithoutOne isNonAssociativeRingWithoutOne public
+    hiding (+-isAbelianGroup; *-cong; distrib)
+
   *-isSemigroup : IsSemigroup *
   *-isSemigroup = record
     { isMagma = *-isMagma
@@ -755,65 +791,16 @@ record IsNonAssociativeRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a 
     *-cong           : Congruent₂ *
     *-identity       : Identity 1# *
     distrib          : * DistributesOver +
-    zero             : Zero 0# *
 
-  open IsAbelianGroup +-isAbelianGroup public
-    renaming
-    ( assoc                   to +-assoc
-    ; ∙-cong                  to +-cong
-    ; ∙-congˡ                 to +-congˡ
-    ; ∙-congʳ                 to +-congʳ
-    ; identity                to +-identity
-    ; identityˡ               to +-identityˡ
-    ; identityʳ               to +-identityʳ
-    ; inverse                 to -‿inverse
-    ; inverseˡ                to -‿inverseˡ
-    ; inverseʳ                to -‿inverseʳ
-    ; ⁻¹-cong                 to -‿cong
-    ; comm                    to +-comm
-    ; isMagma                 to +-isMagma
-    ; isSemigroup             to +-isSemigroup
-    ; isMonoid                to +-isMonoid
-    ; isUnitalMagma           to +-isUnitalMagma
-    ; isCommutativeMagma      to +-isCommutativeMagma
-    ; isCommutativeMonoid     to +-isCommutativeMonoid
-    ; isCommutativeSemigroup  to +-isCommutativeSemigroup
-    ; isInvertibleMagma       to +-isInvertibleMagma
-    ; isInvertibleUnitalMagma to +-isInvertibleUnitalMagma
-    ; isGroup                 to +-isGroup
-    )
-
-  distribˡ : * DistributesOverˡ +
-  distribˡ = proj₁ distrib
-
-  distribʳ : * DistributesOverʳ +
-  distribʳ = proj₂ distrib
-
-  zeroˡ : LeftZero 0# *
-  zeroˡ = Consequences.assoc∧distribʳ∧idʳ∧invʳ⇒zeˡ setoid
-    +-cong *-cong +-assoc distribʳ +-identityʳ -‿inverseʳ
-
-  zeroʳ : RightZero 0# *
-  zeroʳ = Consequences.assoc∧distribˡ∧idʳ∧invʳ⇒zeʳ setoid
-    +-cong *-cong +-assoc distribˡ +-identityʳ -‿inverseʳ
-{-
-  zeroˡ : LeftZero 0# *
-  zeroˡ = proj₁ zero
-
-  zeroʳ : RightZero 0# *
-  zeroʳ = proj₂ zero
-
-  distribˡ : * DistributesOverˡ +
-  distribˡ = proj₁ distrib
-
-  distribʳ : * DistributesOverʳ +
-  distribʳ = proj₂ distrib
--}
-  *-isMagma : IsMagma *
-  *-isMagma = record
-    { isEquivalence = isEquivalence
-    ; ∙-cong        = *-cong
+  isNonAssociativeRingWithoutOne : IsNonAssociativeRingWithoutOne + * -_ 0#
+  isNonAssociativeRingWithoutOne = record
+    { +-isAbelianGroup = +-isAbelianGroup
+    ; *-cong           = *-cong
+    ; distrib          = distrib
     }
+
+  open IsNonAssociativeRingWithoutOne isNonAssociativeRingWithoutOne public
+    hiding (+-isAbelianGroup; *-cong; distrib)
 
   *-identityˡ : LeftIdentity 1# *
   *-identityˡ = proj₁ *-identity
