@@ -783,6 +783,20 @@ record IsNonAssociativeRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a 
     ; isGroup                 to +-isGroup
     )
 
+  distribˡ : * DistributesOverˡ +
+  distribˡ = proj₁ distrib
+
+  distribʳ : * DistributesOverʳ +
+  distribʳ = proj₂ distrib
+
+  zeroˡ : LeftZero 0# *
+  zeroˡ = Consequences.assoc∧distribʳ∧idʳ∧invʳ⇒zeˡ setoid
+    +-cong *-cong +-assoc distribʳ +-identityʳ -‿inverseʳ
+
+  zeroʳ : RightZero 0# *
+  zeroʳ = Consequences.assoc∧distribˡ∧idʳ∧invʳ⇒zeʳ setoid
+    +-cong *-cong +-assoc distribˡ +-identityʳ -‿inverseʳ
+{-
   zeroˡ : LeftZero 0# *
   zeroˡ = proj₁ zero
 
@@ -794,7 +808,7 @@ record IsNonAssociativeRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a 
 
   distribʳ : * DistributesOverʳ +
   distribʳ = proj₂ distrib
-
+-}
   *-isMagma : IsMagma *
   *-isMagma = record
     { isEquivalence = isEquivalence
