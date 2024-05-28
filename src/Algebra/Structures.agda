@@ -538,6 +538,15 @@ record IsQuasiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
   zeroʳ : RightZero 0# *
   zeroʳ = proj₂ zero
 
+  isNearSemiring : IsNearSemiring + * 0#
+  isNearSemiring = record
+    { +-isMonoid    = +-isMonoid
+    ; *-cong        = *-cong
+    ; *-assoc       = *-assoc
+    ; distribʳ      = distribʳ
+    ; zeroˡ         = zeroˡ
+    }
+
 record IsSemiringWithoutAnnihilatingZero (+ * : Op₂ A)
                                          (0# 1# : A) : Set (a ⊔ ℓ) where
   field
@@ -549,56 +558,26 @@ record IsSemiringWithoutAnnihilatingZero (+ * : Op₂ A)
     *-identity            : Identity 1# *
     distrib               : * DistributesOver +
 
-  distribˡ : * DistributesOverˡ +
-  distribˡ = proj₁ distrib
-
-  distribʳ : * DistributesOverʳ +
-  distribʳ = proj₂ distrib
-
   open IsCommutativeMonoid +-isCommutativeMonoid public
+    using ()
     renaming
-    ( assoc                  to +-assoc
-    ; ∙-cong                 to +-cong
-    ; ∙-congˡ                to +-congˡ
-    ; ∙-congʳ                to +-congʳ
-    ; identity               to +-identity
-    ; identityˡ              to +-identityˡ
-    ; identityʳ              to +-identityʳ
-    ; comm                   to +-comm
-    ; isMagma                to +-isMagma
-    ; isSemigroup            to +-isSemigroup
+    ( comm                   to +-comm
     ; isMonoid               to +-isMonoid
-    ; isUnitalMagma          to +-isUnitalMagma
     ; isCommutativeMagma     to +-isCommutativeMagma
     ; isCommutativeSemigroup to +-isCommutativeSemigroup
     )
 
-  *-isMagma : IsMagma *
-  *-isMagma = record
-    { isEquivalence = isEquivalence
-    ; ∙-cong        = *-cong
+  isQuasiringWithoutAnnihilatingZero : IsQuasiringWithoutAnnihilatingZero + * 0# 1#
+  isQuasiringWithoutAnnihilatingZero = record
+    { +-isMonoid = +-isMonoid
+    ; *-cong     = *-cong
+    ; *-assoc    = *-assoc
+    ; *-identity = *-identity
+    ; distrib    = distrib
     }
 
-  *-isSemigroup : IsSemigroup *
-  *-isSemigroup = record
-    { isMagma = *-isMagma
-    ; assoc   = *-assoc
-    }
-
-  *-isMonoid : IsMonoid * 1#
-  *-isMonoid = record
-    { isSemigroup = *-isSemigroup
-    ; identity    = *-identity
-    }
-
-  open IsMonoid *-isMonoid public
-    using ()
-    renaming
-    ( ∙-congˡ     to *-congˡ
-    ; ∙-congʳ     to *-congʳ
-    ; identityˡ   to *-identityˡ
-    ; identityʳ   to *-identityʳ
-    )
+  open IsQuasiringWithoutAnnihilatingZero isQuasiringWithoutAnnihilatingZero public
+    hiding (+-isMonoid; *-cong; *-assoc; *-identity; distrib)
 
 
 record IsSemiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
@@ -619,7 +598,11 @@ record IsSemiring (+ * : Op₂ A) (0# 1# : A) : Set (a ⊔ ℓ) where
     ; zero                  = zero
     }
 
-  open IsSemiringWithoutOne isSemiringWithoutOne public
+  isQuasiring : IsQuasiring + * 0# 1#
+  isQuasiring = record { Q ; zero = zero }
+    where module Q = IsQuasiringWithoutAnnihilatingZero isQuasiringWithoutAnnihilatingZero
+
+  open IsQuasiring isQuasiring public
     using
     ( isNearSemiring
     ; zeroˡ
@@ -751,6 +734,13 @@ record IsNonAssociativeRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : 
     ; ∙-cong        = *-cong
     }
 
+  open IsMagma *-isMagma public
+    using ()
+    renaming
+    ( ∙-congˡ   to *-congˡ
+    ; ∙-congʳ   to *-congʳ
+    )
+
 record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ) where
   field
     +-isAbelianGroup : IsAbelianGroup + 0# -_
@@ -774,12 +764,6 @@ record IsRingWithoutOne (+ * : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ
     ; assoc   = *-assoc
     }
 
-  open IsSemigroup *-isSemigroup public
-    using ()
-    renaming
-    ( ∙-congˡ   to *-congˡ
-    ; ∙-congʳ   to *-congʳ
-    )
 
 ------------------------------------------------------------------------
 -- Structures with 2 binary operations, 1 unary operation & 2 elements
@@ -814,13 +798,6 @@ record IsNonAssociativeRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a 
     ; identity = *-identity
     }
 
-  open IsUnitalMagma *-isUnitalMagma public
-    using ()
-    renaming
-    ( ∙-congˡ   to *-congˡ
-    ; ∙-congʳ   to *-congʳ
-    )
-
 record IsNearring (+ * : Op₂ A) (0# 1# : A) (_⁻¹ : Op₁ A) : Set (a ⊔ ℓ) where
   field
     isQuasiring : IsQuasiring + * 0# 1#
@@ -854,19 +831,6 @@ record IsRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a ⊔ ℓ) where
   open IsRingWithoutOne isRingWithoutOne public
     hiding (+-isAbelianGroup; *-cong; *-assoc; distrib)
 
-  *-isMonoid : IsMonoid * 1#
-  *-isMonoid = record
-    { isSemigroup = *-isSemigroup
-    ; identity    = *-identity
-    }
-
-  open IsMonoid *-isMonoid public
-    using ()
-    renaming
-    ( identityˡ   to *-identityˡ
-    ; identityʳ   to *-identityʳ
-    )
-
   isSemiringWithoutAnnihilatingZero
     : IsSemiringWithoutAnnihilatingZero + * 0# 1#
   isSemiringWithoutAnnihilatingZero = record
@@ -885,7 +849,8 @@ record IsRing (+ * : Op₂ A) (-_ : Op₁ A) (0# 1# : A) : Set (a ⊔ ℓ) where
     }
 
   open IsSemiring isSemiring public
-    using (isNearSemiring; isSemiringWithoutOne)
+    using (isNearSemiring; isSemiringWithoutOne
+          ; *-isMonoid; *-identityˡ; *-identityʳ)
 
 
 record IsCommutativeRing
