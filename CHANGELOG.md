@@ -147,6 +147,11 @@ New modules
   - `⊆-upper-bound-cospan` generalising `⊆-disjoint-union-cospan` from (*)
   ```
 
+* Refactored `DivMod` specification from `Data.Nat.DivMod` to:
+  ```agda
+  Data.Nat.DivMod.Spec.DivMod
+  ```
+
 * Prime factorisation of natural numbers.
   ```
   Data.Nat.Primality.Factorisation

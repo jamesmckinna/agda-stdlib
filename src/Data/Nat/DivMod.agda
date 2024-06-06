@@ -14,6 +14,7 @@ open import Data.Fin.Base using (Fin; toℕ; fromℕ<)
 open import Data.Fin.Properties using (nonZeroIndex; toℕ-fromℕ<)
 open import Data.Nat.Base
 open import Data.Nat.DivMod.Core
+import Data.Nat.DivMod.Spec as Spec
 open import Data.Nat.Divisibility.Core
 open import Data.Nat.Induction
 open import Data.Nat.Properties
@@ -36,10 +37,13 @@ open import Data.Nat.Base public
   using (_%_; _/_)
 
 ------------------------------------------------------------------------
--- Relationship between _%_ and _/_
+-- Re-export 
 
-m≡m%n+[m/n]*n : ∀ m n .{{_ : NonZero n}} → m ≡ m % n + (m / n) * n
-m≡m%n+[m/n]*n m (suc n) = div-mod-lemma 0 0 m n
+open Spec public
+  using (m≡m%n+[m/n]*n; m%n<n)
+
+------------------------------------------------------------------------
+-- Relationship between _%_ and _/_
 
 m%n≡m∸m/n*n : ∀ m n .{{_ : NonZero n}} → m % n ≡ m ∸ (m / n) * n
 m%n≡m∸m/n*n m n = begin-equality
@@ -94,9 +98,6 @@ m*n≤o⇒[o∸m*n]%n≡o%n m {n} {o} m*n≤o = begin-equality
 
 m*n%n≡0 : ∀ m n .{{_ : NonZero n}} → (m * n) % n ≡ 0
 m*n%n≡0 m n@(suc _) = [m+kn]%n≡m%n 0 m n
-
-m%n<n : ∀ m n .{{_ : NonZero n}} → m % n < n
-m%n<n m (suc n-1) = s≤s (a[modₕ]n<n 0 m n-1)
 
 m%n≤n : ∀ m n .{{_ : NonZero n}} → m % n ≤ n
 m%n≤n m n = <⇒≤ (m%n<n m n)
@@ -465,30 +466,6 @@ m%n*o≡m*o%[n*o] m n o = begin-equality
 ------------------------------------------------------------------------
 --  A specification of integer division.
 
-record DivMod (dividend divisor : ℕ) : Set where
-  constructor result
-  field
-    quotient  : ℕ
-    remainder : Fin divisor
-    property  : dividend ≡ toℕ remainder + quotient * divisor
-
-  nonZeroDivisor : NonZero divisor
-  nonZeroDivisor = nonZeroIndex remainder
-
-
-infixl 7 _div_ _mod_ _divMod_
-
-_div_ : (dividend divisor : ℕ) .{{_ : NonZero divisor}} → ℕ
-_div_ = _/_
-
-_mod_ : (dividend divisor : ℕ) .{{_ : NonZero divisor}} → Fin divisor
-m mod n = fromℕ< (m%n<n m n)
-
-_divMod_ : (dividend divisor : ℕ) .{{_ : NonZero divisor}} →
-           DivMod dividend divisor
-m divMod n = result (m / n) (m mod n) $ begin-equality
-  m                               ≡⟨  m≡m%n+[m/n]*n m n ⟩
-  m % n                + [m/n]*n  ≡⟨ cong (_+ [m/n]*n) (toℕ-fromℕ< [m%n]<n) ⟨
-  toℕ (fromℕ< [m%n]<n) + [m/n]*n  ∎
-  where [m/n]*n = m / n * n ; [m%n]<n = m%n<n m n
+open Spec public
+  using (_div_; _mod_; _divMod_; DivMod)
 
