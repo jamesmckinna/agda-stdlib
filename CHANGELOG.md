@@ -12,6 +12,9 @@ Bug-fixes
 * Removed unnecessary parameter `#-trans : Transitive _#_` from
   `Relation.Binary.Reasoning.Base.Apartness`.
 
+* Refactored `Function.Bundles` to export `toFunction` and `fromFunction`
+  from `*Inverse` with corresponding deprecations in `Function.Properties.Inverse`.
+
 Non-backwards compatible changes
 --------------------------------
 
