@@ -186,6 +186,11 @@ New modules
 Additions to existing modules
 -----------------------------
 
+* In `Algebra.Bundles`:
+  ```agda
+  record BooleanRing c ℓ : Set (suc (c ⊔ ℓ))
+  ```
+
 * In `Algebra.Construct.Pointwise`:
   ```agda
   isNearSemiring                  : IsNearSemiring _≈_ _+_ _*_ 0# →
@@ -251,6 +256,11 @@ Additions to existing modules
 * In `Algebra.Properties.CommutativeSemigroup.Divisibility`:
   ```agda
   ∙-cong-∣ : x ∣ y → a ∣ b → x ∙ a ∣ y ∙ b
+  ```
+
+* In `Algebra.Structures`:
+  ```agda
+  record IsBooleanRing (+ * : Op₂ A) (- : Op₁ A) (0# 1# : A) : Set (a ⊔ ℓ)
   ```
 
 * In `Data.Fin.Base`:
