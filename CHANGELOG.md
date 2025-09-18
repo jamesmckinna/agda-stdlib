@@ -99,6 +99,17 @@ Additions to existing modules
                     updateAt (padRight m≤n x xs) (inject≤ i m≤n) f ≡ padRight m≤n x (updateAt xs i f)
   ```
 
+* In `Relation.Binary.Consequences`
+  ```agda
+  directed⇒finitely-directed : Directed _≤_ → Transitive _≲_ →
+	                       (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
+  ```
+
+* In `Relation.Binary.Definitions`
+  ```agda
+  Directed _≤_ = ∀ x y → ∃[ z ] x ≤ z × y ≤ z
+  ```
+
 * In `Relation.Nullary.Negation.Core`
   ```agda
   ¬¬-η : A → ¬ ¬ A

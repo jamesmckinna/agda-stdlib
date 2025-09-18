@@ -8,7 +8,9 @@
 
 module Relation.Binary.Consequences where
 
-open import Data.Product.Base using (_,_)
+open import Data.Fin.Base using (Fin; zero; suc)
+open import Data.Nat.Base using (ℕ; zero; suc)
+open import Data.Product.Base using (_,_; ∃-syntax)
 open import Data.Sum.Base as Sum using (inj₁; inj₂; [_,_]′)
 open import Function.Base using (_∘_; _∘₂_; _$_; flip)
 open import Level using (Level)
@@ -188,6 +190,21 @@ module _ {_≈_ : Rel A ℓ₁} {_<_ : Rel A ℓ₂} where
   trans∧tri⇒resp sym ≈-tr <-tr tri =
     trans∧tri⇒respʳ sym ≈-tr <-tr tri ,
     trans∧tri⇒respˡ ≈-tr <-tr tri
+
+------------------------------------------------------------------------
+-- Proofs for Directed relations
+
+module _ {_≲_ : Rel A ℓ₁} (directed : Directed _≲_)
+         (trans : Transitive _≲_) where
+
+  directed⇒finitely-directed : ∀ {n} (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
+  directed⇒finitely-directed {n = zero}  f =
+    let z , f₀≲z , _ = directed (f zero) (f zero) in
+    z ,  λ where zero → f₀≲z
+  directed⇒finitely-directed {n = suc n} f =
+    let y , ∀[i]fi≲y = directed⇒finitely-directed (f ∘ suc) in
+    let z , f₀≲z , y≲z = directed (f zero) y in
+    z ,  λ { zero → f₀≲z ; (suc i) → trans (∀[i]fi≲y i) y≲z }
 
 ------------------------------------------------------------------------
 -- Without Loss of Generality
