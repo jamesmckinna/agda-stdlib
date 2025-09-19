@@ -194,17 +194,39 @@ module _ {_≈_ : Rel A ℓ₁} {_<_ : Rel A ℓ₂} where
 ------------------------------------------------------------------------
 -- Proofs for Directed relations
 
-module _ {_≲_ : Rel A ℓ₁} (directed : Directed _≲_)
-         (trans : Transitive _≲_) where
+module _ {_≲_ : Rel A ℓ₁} (directed : Directed _≲_) (trans : Transitive _≲_)
+  where
 
-  directed⇒finitely-directed : ∀ {n} (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
-  directed⇒finitely-directed {n = zero}  f =
+  directed⇒finitely-directed₁ : ∀ {n} (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
+  directed⇒finitely-directed₁ {n = zero}  f =
     let z , f₀≲z , _ = directed (f zero) (f zero) in
     z ,  λ where zero → f₀≲z
-  directed⇒finitely-directed {n = suc n} f =
-    let y , ∀[i]fi≲y = directed⇒finitely-directed (f ∘ suc) in
+  directed⇒finitely-directed₁ {n = suc n} f =
+    let y , ∀[i]fi≲y = directed⇒finitely-directed₁ (f ∘ suc) in
     let z , f₀≲z , y≲z = directed (f zero) y in
-    z ,  λ { zero → f₀≲z ; (suc i) → trans (∀[i]fi≲y i) y≲z }
+    z ,  λ where zero → f₀≲z ; (suc i) → trans (∀[i]fi≲y i) y≲z
+
+  directed⇒finitely-directed : A → FinitelyDirected _≲_
+  directed⇒finitely-directed x {n = zero}  _ = x , λ()
+  directed⇒finitely-directed x {n = suc _} f = directed⇒finitely-directed₁ f
+
+module _ {_≲_ : Rel A ℓ₁} (finitelyDirected : FinitelyDirected _≲_)
+  where
+
+  finitely-directed⇒inhabited : A
+  finitely-directed⇒inhabited =
+    let z , _ = finitelyDirected {n = 0} λ() in z
+
+  finitely-directed⇒≲-inhabited : ∃₂ λ x y → x ≲ y
+  finitely-directed⇒≲-inhabited =
+    let y , upperBound = finitelyDirected {n = 1} λ where 0F → x
+    in x , y , upperBound 0F
+    where x = finitely-directed⇒inhabited
+
+  finitely-directed⇒directed : Directed _≲_
+  finitely-directed⇒directed x y =
+    let z , upperBound = finitelyDirected {n = 2} λ where 0F → x ; 1F → y in
+    z , upperBound 0F , upperBound 1F
 
 ------------------------------------------------------------------------
 -- Without Loss of Generality
