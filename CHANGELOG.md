@@ -101,13 +101,19 @@ Additions to existing modules
 
 * In `Relation.Binary.Consequences`
   ```agda
-  directed⇒finitely-directed : Directed _≤_ → Transitive _≲_ →
-	                       (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
+  directed⇒finitely-directed₁   : Directed _≤_ → Transitive _≲_ →
+	                          (f : Fin (suc n) → A) → ∃[ z ] ∀ i → f i ≲ z
+  directed⇒finitely-directed    : Directed _≤_ → Transitive _≲_ → A →
+	                          FinitelyDirected _≤_
+  finitely-directed⇒inhabited   : FinitelyDirected _≤_ → A
+  finitely-directed⇒≲-inhabited : FinitelyDirected _≤_ → ∃₂ λ x y → x ≲ y
+  finitely-directed⇒directed    : FinitelyDirected _≤_ → Directed _≤_
   ```
 
 * In `Relation.Binary.Definitions`
   ```agda
   Directed _≤_ = ∀ x y → ∃[ z ] x ≤ z × y ≤ z
+  FinitelyDirected _≲_ = ∀ (f : Fin n → A) → ∃[ z ] ∀ i → f i ≲ z
   ```
 
 * In `Relation.Nullary.Negation.Core`

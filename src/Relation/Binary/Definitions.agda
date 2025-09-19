@@ -11,6 +11,8 @@
 module Relation.Binary.Definitions where
 
 open import Agda.Builtin.Equality using (_≡_)
+open import Data.Fin.Base using (Fin; zero; suc)
+open import Data.Nat.Base using (ℕ; zero; suc)
 open import Data.Product.Base using (_×_; ∃-syntax)
 open import Data.Sum.Base using (_⊎_)
 open import Function.Base using (_on_; flip)
@@ -100,6 +102,9 @@ Dense _<_ = ∀ {x y} → x < y → ∃[ z ] x < z × z < y
 
 Directed : Rel A ℓ → Set _
 Directed _≤_ = ∀ x y → ∃[ z ] x ≤ z × y ≤ z
+
+FinitelyDirected : Rel A ℓ → Set _
+FinitelyDirected {A = A} _≲_ = ∀ {n} (f : Fin n → A) → ∃[ z ] ∀ i → f i ≲ z
 
 -- Generalised connex - at least one of the two relations holds.
 
