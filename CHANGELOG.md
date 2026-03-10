@@ -131,6 +131,8 @@ New modules
 
 * `Algebra.Construct.Sub.Group` for the definition of subgroups.
 
+* `Algebra.Definitions.RawGroup` extending multiplication from Nat to Int.
+
 * `Algebra.Module.Construct.Sub.Bimodule` for the definition of subbimodules.
 
 * `Algebra.Properties.BooleanRing`.
