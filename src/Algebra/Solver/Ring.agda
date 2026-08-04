@@ -26,12 +26,13 @@ module Algebra.Solver.Ring
   (Coeff : RawRing r₁ r₄)            -- Coefficient "ring".
   (R : AlmostCommutativeRing r₂ r₃)  -- Main "ring".
   (morphism : Coeff -Raw-AlmostCommutative⟶ R)
-  (_coeff≟_ : WeaklyDecidable (Induced-equivalence morphism))
+  (_C≡?_ : WeaklyDecidable (Induced-equivalence morphism))
   where
 
+open import Agda.Builtin.FromNat using (Number)
 open import Algebra.Core
 open import Algebra.Solver.Ring.Lemmas Coeff R morphism
-private module C = RawRing Coeff
+
 open AlmostCommutativeRing R
   renaming (zero to *-zero; zeroˡ to *-zeroˡ; zeroʳ to *-zeroʳ)
 open import Algebra.Definitions _≈_
@@ -46,8 +47,9 @@ import Relation.Binary.Reflection as Reflection
 
 open import Data.Nat.Base using (ℕ; suc; zero)
 open import Data.Fin.Base using (Fin; zero; suc)
-open import Data.Vec.Base using (Vec; []; _∷_; lookup)
 open import Data.Maybe.Base using (just; nothing)
+open import Data.Unit.Polymorphic.Base using (⊤)
+open import Data.Vec.Base using (Vec; []; _∷_; lookup)
 open import Function.Base using (_⟨_⟩_; _$_)
 open import Level using (_⊔_)
 
@@ -62,6 +64,12 @@ private
   variable
     n : ℕ
 
+  module C = RawRing Coeff
+
+  ℕtoC : ℕ → C.Carrier
+  ℕtoC zero = C.0#
+  ℕtoC (suc zero) = C.1#
+  ℕtoC (suc n@(suc _)) = C.1# C.+ ℕtoC n
 
 ------------------------------------------------------------------------
 -- Polynomials
@@ -111,6 +119,14 @@ Env = Vec Carrier
 ⟦ var x      ⟧ ρ = lookup ρ x
 ⟦ p :^ n     ⟧ ρ = ⟦ p ⟧ ρ ^ n
 ⟦ :- p       ⟧ ρ = - ⟦ p ⟧ ρ
+
+-- Number literals
+
+number : ∀ {n} → Number (Polynomial n)
+number = record
+  { Constraint = λ _ → ⊤ {r₁}
+  ; fromNat    = λ n → con (ℕtoC n)
+  }
 
 ------------------------------------------------------------------------
 -- Normal forms of polynomials
@@ -197,7 +213,7 @@ mutual
   ... | nothing    | _          = nothing
 
   _≟N_ : WeaklyDecidable (_≈N_ {n = n})
-  con c₁ ≟N con c₂ with c₁ coeff≟ c₂
+  con c₁ ≟N con c₂ with c₁ C≡? c₂
   ... | just c₁≈c₂ = just (con c₁≈c₂)
   ... | nothing    = nothing
   poly p₁ ≟N poly p₂ with p₁ ≟H p₂
@@ -551,7 +567,7 @@ correct (:- p) ρ = begin
   - ⟦ p ⟧ ρ              ∎
 
 ------------------------------------------------------------------------
--- "Tactic.
+-- Tactic.
 
 open Reflection setoid var ⟦_⟧ ⟦_⟧↓ correct public
   using (prove; solve) renaming (_⊜_ to _:=_)
