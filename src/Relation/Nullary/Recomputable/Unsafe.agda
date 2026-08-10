@@ -4,21 +4,18 @@
 -- Recomputable types and their algebra as Harrop formulas
 ------------------------------------------------------------------------
 
-{-# OPTIONS --cubical-compatible --irrelevant-projections #-}
+{-# OPTIONS --without-K --irrelevant-projections #-}
 
 module Relation.Nullary.Recomputable.Unsafe where
 
-open import Data.Empty using (⊥)
-open import Data.Irrelevant using (Irrelevant; irrelevant; [_])
-open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
+open import Data.Irrelevant using (Irrelevant; irrelevant)
 open import Level using (Level)
-open import Relation.Nullary.Negation.Core using (¬_)
 
 private
   variable
-    a b : Level
+    a : Level
     A : Set a
-    B : Set b
+
 
 ------------------------------------------------------------------------
 -- Re-export
