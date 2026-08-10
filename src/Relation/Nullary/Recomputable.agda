@@ -9,7 +9,6 @@
 module Relation.Nullary.Recomputable where
 
 open import Data.Empty using (⊥)
-open import Data.Irrelevant using (Irrelevant; irrelevant; [_])
 open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
 open import Level using (Level)
 open import Relation.Nullary.Negation.Core using (¬_)
