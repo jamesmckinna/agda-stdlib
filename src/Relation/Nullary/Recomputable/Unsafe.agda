@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- The Agda standard library
 --
--- Recomputable types and their algebra as Harrop formulas
+-- Irrelevant types are Recomputable
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --irrelevant-projections #-}
