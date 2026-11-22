@@ -11,8 +11,8 @@ module Data.Bool.Base where
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Unit.Base using (⊤)
 open import Data.Empty using (⊥)
-open import Level using (Level)
-import Relation.Binary.Core as Binary using (_⇒_)
+open import Level using (Level; zero)
+open import Relation.Binary.Core using (Rel; _⇒_)
 
 private
   variable
@@ -27,16 +27,17 @@ open import Agda.Builtin.Bool public
 ------------------------------------------------------------------------
 -- Relations
 
-infix 4 _≤_ _<_
+infix 4 _<_ _≤_
 
-data _≤_ : Bool → Bool → Set where
-  f≤t : false ≤ true
-  ≤-reflexive : _≡_ Binary.⇒ _≤_
-
-pattern b≤b = ≤-reflexive refl
-
-data _<_ : Bool → Bool → Set where
+data _<_ : Rel Bool zero where
   f<t : false < true
+
+data _≤_ : Rel Bool zero where
+  <⇒≤ : _<_ ⇒ _≤_
+  ≤-reflexive : _≡_ ⇒ _≤_
+
+pattern f≤t = <⇒≤ f<t
+pattern b≤b = ≤-reflexive refl
 
 ------------------------------------------------------------------------
 -- Boolean operations

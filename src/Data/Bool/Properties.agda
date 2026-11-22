@@ -16,7 +16,7 @@ open import Algebra.Lattice.Bundles
 import Algebra.Lattice.Properties.BooleanAlgebra as BooleanAlgebraProperties
 open import Data.Bool.Base
   using (Bool; true; false; not; _∧_; _∨_; _xor_ ; if_then_else_; T; _≤_; _<_
-        ; ≤-reflexive; b≤b; f≤t; f<t)
+        ; ≤-reflexive; <⇒≤; b≤b; f≤t; f<t)
 open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂; [_,_])
 open import Function.Base using (_⟨_⟩_; const; id)
@@ -56,6 +56,8 @@ private
     a b : Level
     A : Set a
     B : Set b
+    x y : Bool
+
 
 ------------------------------------------------------------------------
 -- Properties of _≡_
@@ -75,10 +77,86 @@ false ≡? true  = no λ()
 ≡-decSetoid = decSetoid _≡?_
 
 ------------------------------------------------------------------------
+-- Properties of _<_
+
+¬t<f : ¬ true < false
+¬t<f ()
+
+-- Relational properties
+
+<-irrefl : Irreflexive _≡_ _<_
+<-irrefl refl ()
+
+<-asym : Asymmetric _<_
+<-asym f<t ()
+
+<-trans : Transitive _<_
+<-trans f<t ()
+
+<-transʳ : Trans _≤_ _<_ _<_
+<-transʳ b≤b f<t = f<t
+
+<-transˡ : Trans _<_ _≤_ _<_
+<-transˡ f<t b≤b = f<t
+
+<-cmp : Trichotomous _≡_ _<_
+<-cmp false false = tri≈ (λ()) refl  (λ())
+<-cmp false true  = tri< f<t   (λ()) (λ())
+<-cmp true  false = tri> (λ()) (λ()) f<t
+<-cmp true  true  = tri≈ (λ()) refl  (λ())
+
+infix 4 _<?_
+
+_<?_ : Decidable _<_
+false <? false = no  λ()
+false <? true  = yes f<t
+true  <? _     = no  λ()
+
+<-resp₂-≡ : _<_ Respects₂ _≡_
+<-resp₂-≡ = subst (_< _) , subst (_ <_)
+
+<-irrelevant : Irrelevant _<_
+<-irrelevant f<t f<t = refl
+
+<-wellFounded : WellFounded _<_
+<-wellFounded _ = acc <-acc
+  where
+    <-acc : y < x → Acc _<_ y
+    <-acc f<t = acc λ()
+
+-- Structures
+
+<-isStrictPartialOrder : IsStrictPartialOrder _≡_ _<_
+<-isStrictPartialOrder = record
+  { isEquivalence = isEquivalence
+  ; irrefl        = <-irrefl
+  ; trans         = <-trans
+  ; <-resp-≈      = <-resp₂-≡
+  }
+
+<-isStrictTotalOrder : IsStrictTotalOrder _≡_ _<_
+<-isStrictTotalOrder = record
+  { isStrictPartialOrder = <-isStrictPartialOrder
+  ; compare              = <-cmp
+  }
+
+-- Bundles
+
+<-strictPartialOrder : StrictPartialOrder 0ℓ 0ℓ 0ℓ
+<-strictPartialOrder = record
+  { isStrictPartialOrder = <-isStrictPartialOrder
+  }
+
+<-strictTotalOrder : StrictTotalOrder 0ℓ 0ℓ 0ℓ
+<-strictTotalOrder = record
+  { isStrictTotalOrder = <-isStrictTotalOrder
+  }
+
+------------------------------------------------------------------------
 -- Properties of _≤_
 
 ¬t≤f : ¬ true ≤ false
-¬t≤f (≤-reflexive ())
+¬t≤f (<⇒≤ t<f) = ¬t<f t<f
 
 -- Relational properties
 
@@ -165,79 +243,6 @@ true  ≤? true  = yes b≤b
 ≤-decTotalOrder : DecTotalOrder 0ℓ 0ℓ 0ℓ
 ≤-decTotalOrder = record
   { isDecTotalOrder = ≤-isDecTotalOrder
-  }
-
-------------------------------------------------------------------------
--- Properties of _<_
-
--- Relational properties
-
-<-irrefl : Irreflexive _≡_ _<_
-<-irrefl refl ()
-
-<-asym : Asymmetric _<_
-<-asym f<t ()
-
-<-trans : Transitive _<_
-<-trans f<t ()
-
-<-transʳ : Trans _≤_ _<_ _<_
-<-transʳ b≤b f<t = f<t
-
-<-transˡ : Trans _<_ _≤_ _<_
-<-transˡ f<t b≤b = f<t
-
-<-cmp : Trichotomous _≡_ _<_
-<-cmp false false = tri≈ (λ()) refl  (λ())
-<-cmp false true  = tri< f<t   (λ()) (λ())
-<-cmp true  false = tri> (λ()) (λ()) f<t
-<-cmp true  true  = tri≈ (λ()) refl  (λ())
-
-infix 4 _<?_
-
-_<?_ : Decidable _<_
-false <? false = no  (λ())
-false <? true  = yes f<t
-true  <? _     = no  (λ())
-
-<-resp₂-≡ : _<_ Respects₂ _≡_
-<-resp₂-≡ = subst (_< _) , subst (_ <_)
-
-<-irrelevant : Irrelevant _<_
-<-irrelevant f<t f<t = refl
-
-<-wellFounded : WellFounded _<_
-<-wellFounded _ = acc <-acc
-  where
-    <-acc : ∀ {x y} → y < x → Acc _<_ y
-    <-acc f<t = acc λ ()
-
--- Structures
-
-<-isStrictPartialOrder : IsStrictPartialOrder _≡_ _<_
-<-isStrictPartialOrder = record
-  { isEquivalence = isEquivalence
-  ; irrefl        = <-irrefl
-  ; trans         = <-trans
-  ; <-resp-≈      = <-resp₂-≡
-  }
-
-<-isStrictTotalOrder : IsStrictTotalOrder _≡_ _<_
-<-isStrictTotalOrder = record
-  { isStrictPartialOrder = <-isStrictPartialOrder
-  ; compare              = <-cmp
-  }
-
--- Bundles
-
-<-strictPartialOrder : StrictPartialOrder 0ℓ 0ℓ 0ℓ
-<-strictPartialOrder = record
-  { isStrictPartialOrder = <-isStrictPartialOrder
-  }
-
-<-strictTotalOrder : StrictTotalOrder 0ℓ 0ℓ 0ℓ
-<-strictTotalOrder = record
-  { isStrictTotalOrder = <-isStrictTotalOrder
   }
 
 ------------------------------------------------------------------------
@@ -660,15 +665,15 @@ not-involutive : Involutive not
 not-involutive true  = refl
 not-involutive false = refl
 
-not-injective : ∀ {x y} → not x ≡ not y → x ≡ y
+not-injective : not x ≡ not y → x ≡ y
 not-injective {false} {false} nx≢ny = refl
 not-injective {true}  {true}  nx≢ny = refl
 
-not-¬ : ∀ {x y} → x ≡ y → x ≢ not y
+not-¬ : x ≡ y → x ≢ not y
 not-¬ {true}  refl ()
 not-¬ {false} refl ()
 
-¬-not : ∀ {x y} → x ≢ y → x ≡ not y
+¬-not : x ≢ y → x ≡ not y
 ¬-not {true}  {true}  x≢y = ¬[x≢x] x≢y
 ¬-not {true}  {false} _   = refl
 ¬-not {false} {true}  _   = refl
@@ -859,12 +864,12 @@ T-not-≡ : ∀ {x} → T (not x) ⇔ x ≡ false
 T-not-≡ {false} = mk⇔ (const refl) (const _)
 T-not-≡ {true}  = mk⇔ (λ ())       (λ ())
 
-T-∧ : ∀ {x y} → T (x ∧ y) ⇔ (T x × T y)
+T-∧ : T (x ∧ y) ⇔ (T x × T y)
 T-∧ {true}  {true}  = mk⇔ (const (_ , _)) (const _)
 T-∧ {true}  {false} = mk⇔ (λ ())          proj₂
 T-∧ {false} {_}     = mk⇔ (λ ())          proj₁
 
-T-∨ : ∀ {x y} → T (x ∨ y) ⇔ (T x ⊎ T y)
+T-∨ : T (x ∨ y) ⇔ (T x ⊎ T y)
 T-∨ {true}  {_}     = mk⇔ inj₁ (const _)
 T-∨ {false} {true}  = mk⇔ inj₂ (const _)
 T-∨ {false} {false} = mk⇔ inj₁ [ id , id ]
